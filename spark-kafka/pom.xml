@@ -1,0 +1,39 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <parent>
+        <artifactId>DataService-FusionInsight</artifactId>
+        <groupId>com.wuxian.dataservice</groupId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+    <artifactId>spark-kafka</artifactId>
+    <name>DataService Spark Kafka</name>
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <inceptionYear>2018</inceptionYear>
+
+    <dependencies>
+        <!-- ScalaActor -->
+        <dependency>
+            <groupId>org.scala-lang</groupId>
+            <artifactId>scala-actors</artifactId>
+        </dependency>
+
+        <!-- Spark -->
+        <dependency>
+            <groupId>org.apache.spark</groupId>
+            <artifactId>spark-streaming_2.10</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.spark</groupId>
+            <artifactId>spark-streaming-kafka_2.10</artifactId>
+        </dependency>
+
+        <!-- DataService -->
+        <dependency>
+            <groupId>com.wuxian.dataservice</groupId>
+            <artifactId>commons</artifactId>
+        </dependency>
+    </dependencies>
+</project>
