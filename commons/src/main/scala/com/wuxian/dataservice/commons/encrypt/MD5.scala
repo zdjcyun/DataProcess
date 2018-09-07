@@ -31,10 +31,10 @@ object MD5 {
         if (i < 16) buf.append("0")
         buf.append(Integer.toHexString(i))
       }
-      //32位加密
+      // 32位加密
       buf.toString.toUpperCase
       // 16位的加密
-      //return buf.toString().substring(8, 24);
+      // return buf.toString().substring(8, 24);
     } catch {
       case ex: Exception =>
         ex.toString

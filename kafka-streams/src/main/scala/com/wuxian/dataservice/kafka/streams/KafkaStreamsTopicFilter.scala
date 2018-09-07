@@ -40,7 +40,7 @@ object KafkaStreamsTopicFilter extends App with PubFunction {
 
   val props = new Properties()
 
-  props.put(StreamsConfig.APPLICATION_ID_CONFIG, paramConfig.get("kafka.application.id").getOrElse("kafka-streams-filter-application"))
+  props.put(StreamsConfig.APPLICATION_ID_CONFIG, paramConfig.get("kafka.application.id").getOrElse("KafkaStreamsTopicFilter"))
   props.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, paramConfig("kafka.bootstrap.servers"))
 
   props.put(StreamsConfig.KEY_SERDE_CLASS_CONFIG, Serdes.String().getClass)
