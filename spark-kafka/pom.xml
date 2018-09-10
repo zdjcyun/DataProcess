@@ -2,7 +2,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <parent>
         <artifactId>DataService-FusionInsight</artifactId>
-        <groupId>com.wuxian.dataservice</groupId>
+        <groupId>com.service.data</groupId>
         <version>1.0-SNAPSHOT</version>
     </parent>
     <artifactId>spark-kafka</artifactId>
@@ -23,7 +23,8 @@
         <dependency>
             <groupId>org.apache.spark</groupId>
             <artifactId>spark-streaming_2.10</artifactId>
-            <scope>provided</scope>
+            <!--打包部署的时候需要放开注释-->
+            <!--<scope>provided</scope>-->
         </dependency>
         <dependency>
             <groupId>org.apache.spark</groupId>
@@ -32,7 +33,7 @@
 
         <!-- DataService -->
         <dependency>
-            <groupId>com.wuxian.dataservice</groupId>
+            <groupId>com.service.data</groupId>
             <artifactId>commons</artifactId>
         </dependency>
     </dependencies>

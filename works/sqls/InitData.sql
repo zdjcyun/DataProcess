@@ -12,5 +12,5 @@ insert into bfb_t_param_config_list values ('spark.streaming.application.name','
 insert into bfb_t_param_config_list values ('spark.streaming.batch.duration','5');
 insert into bfb_t_param_config_list values ('spark.streaming.checkpoint.dir','nocp');
 
-insert into bfb_t_param_config_list values ('spark.topics.topic1.process.class','com.wuxian.dataservice.spark.streaming.process.DefaultTopicProcess');
-insert into bfb_t_param_config_list values ('spark.topics.topic2.process.class','com.wuxian.dataservice.spark.streaming.process.DefaultTopicProcess');
+insert into bfb_t_param_config_list values ('spark.topics.topic1.process.class','com.service.data.spark.streaming.process.DefaultTextProcess');
+insert into bfb_t_param_config_list values ('spark.topics.topic2.process.class','com.service.data.spark.streaming.process.DefaultJsonProcess');
