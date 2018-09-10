@@ -30,17 +30,17 @@ DataService-FusionInsight 项目根目录
 
 #### 部分截图
 Flume服务端配置文件下载
-![](https://gitee.com/hy-wux/DataService-FusionInsight/raw/master/works/images/007.PNG)  
+![](https://gitee.com/hy-wux/DataService-FusionInsight/raw/master/works/images/007.png)  
 Flume服务端配置文件上传
 ![](https://gitee.com/hy-wux/DataService-FusionInsight/raw/master/works/images/008.png)  
 Flume服务端配置文件生效
-![](https://gitee.com/hy-wux/DataService-FusionInsight/raw/master/works/images/012.PNG)  
+![](https://gitee.com/hy-wux/DataService-FusionInsight/raw/master/works/images/012.png)  
 Flume客户端软件下载
-![](https://gitee.com/hy-wux/DataService-FusionInsight/raw/master/works/images/003.PNG)  
+![](https://gitee.com/hy-wux/DataService-FusionInsight/raw/master/works/images/003.png)  
 Flume客户端采集配置
-![](https://gitee.com/hy-wux/DataService-FusionInsight/raw/master/works/images/013.PNG)  
+![](https://gitee.com/hy-wux/DataService-FusionInsight/raw/master/works/images/013.png)  
 Kafka Topic监控
-![](https://gitee.com/hy-wux/DataService-FusionInsight/raw/master/works/images/015.PNG)  
+![](https://gitee.com/hy-wux/DataService-FusionInsight/raw/master/works/images/015.png)  
 数据库配置项配置
 ![](https://gitee.com/hy-wux/DataService-FusionInsight/raw/master/works/images/020.png)  
 
