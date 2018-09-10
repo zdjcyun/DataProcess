@@ -24,17 +24,27 @@ DataService-FusionInsight 项目根目录
 1. SparkStreaming程序扩展，可以继续增加程序处理功能，完成更复杂的数据处理，比如：指标加工、客户行为分析、客户画像等
 2. 日志格式扩展，目前只开发了支持两种类型的日志格式，可以自定义类实现com.service.data.spark.streaming.process.TopicValueProcess接口，以实现其他格式的日志内容的解析。自定义实现类后，需要在spark-kafka模块的resources/META-INF/services/com.service.data.spark.streaming.process.TopicValueProcess文件中添加一行记录类名称，并且在使用过程中将其配置到数据库中即可。
 
+#### 使用说明
+环境搭建部署：[环境搭建部署文档.docx](https://gitee.com/hy-wux/DataService-FusionInsight/blob/master/works/docs/)[[下载](https://gitee.com/hy-wux/DataService-FusionInsight/raw/master/works/docs/)]  
+数据端配置工具：[数据端配置工具.xlsx](https://gitee.com/hy-wux/DataService-FusionInsight/blob/master/works/docs/%E6%95%B0%E6%8D%AE%E7%AB%AF%E9%85%8D%E7%BD%AE%E5%B7%A5%E5%85%B7.xlsx) [[下载](https://gitee.com/hy-wux/DataService-FusionInsight/raw/master/works/docs/%E6%95%B0%E6%8D%AE%E7%AB%AF%E9%85%8D%E7%BD%AE%E5%B7%A5%E5%85%B7.xlsx)]
+
 #### 部分截图
 Flume服务端配置文件下载
-![](https://gitee.com/hy-wux/DataService-FusionInsight/raw/master/works/images/001.PNG)  
+![](https://gitee.com/hy-wux/DataService-FusionInsight/raw/master/works/images/007.PNG)  
+Flume服务端配置文件上传
+![](https://gitee.com/hy-wux/DataService-FusionInsight/raw/master/works/images/008.PNG)  
+Flume服务端配置文件生效
+![](https://gitee.com/hy-wux/DataService-FusionInsight/raw/master/works/images/012.PNG)  
+Flume客户端软件下载
+![](https://gitee.com/hy-wux/DataService-FusionInsight/raw/master/works/images/003.PNG)  
+Flume客户端采集配置
+![](https://gitee.com/hy-wux/DataService-FusionInsight/raw/master/works/images/013.PNG)  
+Kafka Topic监控
+![](https://gitee.com/hy-wux/DataService-FusionInsight/raw/master/works/images/015.PNG)  
+数据库配置项配置
+![](https://gitee.com/hy-wux/DataService-FusionInsight/raw/master/works/images/020.PNG)  
 
 #### 安装教程
-
-1. xxxx
-2. xxxx
-3. xxxx
-
-#### 使用说明
 
 1. xxxx
 2. xxxx
