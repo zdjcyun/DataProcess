@@ -32,7 +32,7 @@ DataService-FusionInsight 项目根目录
 Flume服务端配置文件下载
 ![](https://gitee.com/hy-wux/DataService-FusionInsight/raw/master/works/images/007.PNG)  
 Flume服务端配置文件上传
-![](https://gitee.com/hy-wux/DataService-FusionInsight/raw/master/works/images/008.PNG)  
+![](https://gitee.com/hy-wux/DataService-FusionInsight/raw/master/works/images/008.png)  
 Flume服务端配置文件生效
 ![](https://gitee.com/hy-wux/DataService-FusionInsight/raw/master/works/images/012.PNG)  
 Flume客户端软件下载
@@ -42,7 +42,7 @@ Flume客户端采集配置
 Kafka Topic监控
 ![](https://gitee.com/hy-wux/DataService-FusionInsight/raw/master/works/images/015.PNG)  
 数据库配置项配置
-![](https://gitee.com/hy-wux/DataService-FusionInsight/raw/master/works/images/020.PNG)  
+![](https://gitee.com/hy-wux/DataService-FusionInsight/raw/master/works/images/020.png)  
 
 #### 安装教程
 
