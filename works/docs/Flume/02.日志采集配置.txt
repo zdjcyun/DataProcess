@@ -151,10 +151,10 @@
     client.sources.source9.filegroups = f1 f2
 
     client.sources.source9.filegroups.f1 = ${HOME}/FlumeClient/works/monitor/sys1-log1.log
-    client.sources.source9.headers.f1.topic = topic1
+    client.sources.source9.headers.f1.topic = demo_topic_1
 
     client.sources.source9.filegroups.f2 = ${HOME}/FlumeClient/works/monitor/sys1-log2.log
-    client.sources.source9.headers.f2.topic = topic2
+    client.sources.source9.headers.f2.topic = demo_topic_2
 
     client.channels.channel9.type = file
     client.channels.channel9.dataDirs = ${HOME}/FlumeClient/works/data

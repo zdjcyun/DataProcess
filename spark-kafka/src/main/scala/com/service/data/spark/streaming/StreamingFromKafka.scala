@@ -67,7 +67,7 @@ object StreamingFromKafka extends PubFunction {
       // IDEA本地直接提交到Yarn执行，需要在resources中添加Hadoop、Spark等的conf文件
       // .setMaster("yarn-client").set("yarn.resourcemanager.hostname", "").set("spark.executor.instances", "2").setJars(Seq())
       // 部署打包的时候需要去掉下面这行
-      .setMaster("local[3]")
+      // .setMaster("local[3]")
 
     val ssc = new StreamingContext(sparkConf, Seconds(paramConfig.get("spark.streaming.batch.duration").getOrElse("5").toLong))
 

@@ -17,6 +17,9 @@ do
             "int")
             printf "$RANDOM"
             ;;
+            "type")
+            printf "T$(($RANDOM % 10))"
+            ;;
             *)
             printf "T$RANDOM"
             ;;

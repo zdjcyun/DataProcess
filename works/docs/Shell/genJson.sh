@@ -19,6 +19,9 @@ do
             "int")
             printf "$RANDOM"
             ;;
+            "type")
+            printf "J$(($RANDOM % 10))"
+            ;;
             *)
             printf "J$RANDOM"
             ;;
