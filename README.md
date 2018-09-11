@@ -27,7 +27,7 @@ DataService-FusionInsight 项目根目录
 #### 使用说明
 数据端配置工具：[数据端配置工具.xlsx](https://gitee.com/hy-wux/DataService-FusionInsight/blob/master/works/docs/%E6%95%B0%E6%8D%AE%E7%AB%AF%E9%85%8D%E7%BD%AE%E5%B7%A5%E5%85%B7.xlsx) [[下载](https://gitee.com/hy-wux/DataService-FusionInsight/raw/master/works/docs/%E6%95%B0%E6%8D%AE%E7%AB%AF%E9%85%8D%E7%BD%AE%E5%B7%A5%E5%85%B7.xlsx)]  
 环境搭建部署文档：[环境搭建部署文档.docx](https://gitee.com/hy-wux/DataService-FusionInsight/blob/master/works/docs/%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA%E9%83%A8%E7%BD%B2%E6%96%87%E6%A1%A3.docx)[[下载](https://gitee.com/hy-wux/DataService-FusionInsight/raw/master/works/docs/%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA%E9%83%A8%E7%BD%B2%E6%96%87%E6%A1%A3.docx)]  
-软件开发打包文档：[软件开发打包文档.docx](https://gitee.com/hy-wux/DataService-FusionInsight/blob/master/works/docs/%E8%BD%AF%E4%BB%B6%E5%BC%80%E5%8F%91%E6%89%93%E5%8C%85%E6%96%87%E6%A1%A3.docx) [[下载](https://gitee.com/hy-wux/DataService-FusionInsight/blob/master/works/docs/%E8%BD%AF%E4%BB%B6%E5%BC%80%E5%8F%91%E6%89%93%E5%8C%85%E6%96%87%E6%A1%A3.docx)]  
+软件开发打包文档：[软件开发打包文档.docx](https://gitee.com/hy-wux/DataService-FusionInsight/blob/master/works/docs/%E8%BD%AF%E4%BB%B6%E5%BC%80%E5%8F%91%E6%89%93%E5%8C%85%E6%96%87%E6%A1%A3.docx) [[下载](https://gitee.com/hy-wux/DataService-FusionInsight/raw/master/works/docs/%E8%BD%AF%E4%BB%B6%E5%BC%80%E5%8F%91%E6%89%93%E5%8C%85%E6%96%87%E6%A1%A3.docx)]  
 
 #### 部分截图
 Flume服务端配置文件下载
