@@ -5,7 +5,7 @@
         <groupId>com.service.data</groupId>
         <version>1.0-SNAPSHOT</version>
     </parent>
-    <artifactId>spark-kafka</artifactId>
+    <artifactId>spark-streaming</artifactId>
     <name>DataService Spark Kafka</name>
 
     <modelVersion>4.0.0</modelVersion>

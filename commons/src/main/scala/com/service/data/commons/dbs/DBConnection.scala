@@ -9,7 +9,7 @@ import scalikejdbc.{ConnectionPool, ConnectionPoolSettings}
   *
   *         数据源处理
   */
-class DBConn {
+class DBConnection {
 
 }
 
@@ -18,7 +18,7 @@ class DBConn {
   *
   *         数据源处理
   */
-object DBConn {
+object DBConnection {
 
   private[this] val props: OrderedProperties = new OrderedProperties()
   private[this] val resource = getClass.getClassLoader.getResource("db.properties")
@@ -36,9 +36,6 @@ object DBConn {
     val url = props.getProperty(s"db.${symbol.name}.url")
     var user = props.getProperty(s"db.${symbol.name}.user")
     var password = props.getProperty(s"db.${symbol.name}.password")
-
-    // 对用户名和密码加密
-    var save = false
 
     if (user.startsWith("${3DES}")) {
       user = EncryptUtil.decrypt3DES(user.substring(7))
@@ -65,5 +62,21 @@ object DBConn {
     */
   def setupAll(): Unit = {
     props.keySet.toArray.filter(_.toString.startsWith("db.")).map(_.toString.split("\\.", -1)).map(x => x(1)).distinct.foreach(x => setup(Symbol(x)))
+  }
+
+  /**
+    * 关闭数据源
+    *
+    * @param symbol
+    */
+  def close(symbol: Symbol): Unit = {
+    ConnectionPool.close(symbol)
+  }
+
+  /**
+    * 关闭所有数据源
+    */
+  def closeAll(): Unit = {
+    props.keySet.toArray.filter(_.toString.startsWith("db.")).map(_.toString.split("\\.", -1)).map(x => x(1)).distinct.foreach(x => close(Symbol(x)))
   }
 }

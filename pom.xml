@@ -5,7 +5,7 @@
     <artifactId>DataService-FusionInsight</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
-    <name>A DataService Parent Project</name>
+    <name>DataService FusionInsight Parent</name>
 
     <modelVersion>4.0.0</modelVersion>
 
@@ -14,7 +14,7 @@
     <modules>
         <module>commons</module>
         <module>kafka-streams</module>
-        <module>spark-kafka</module>
+        <module>spark-streaming</module>
     </modules>
 
     <properties>
@@ -24,7 +24,9 @@
         <scala.version>2.10.4</scala.version>
         <scalikjdbc.version>2.5.0</scalikjdbc.version>
         <log4j.version>1.2.17</log4j.version>
+
         <spark.version>1.5.1</spark.version>
+
         <mysql.version>5.1.38</mysql.version>
         <oracle.version>12.1.0.2</oracle.version>
     </properties>

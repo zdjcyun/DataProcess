@@ -1,6 +1,6 @@
 package com.service.data.commons.logs
 
-import org.apache.log4j.Logger
+import org.slf4j.{Logger, LoggerFactory}
 
 /**
   * @author 伍鲜
@@ -9,21 +9,36 @@ import org.apache.log4j.Logger
   */
 trait Logging {
 
-  private var log_ : Logger = null
+  private var logger: Logger = null
 
   private def logName = {
     this.getClass.getName.stripSuffix("$")
   }
 
-  protected val deepLogs = (System.getProperties != null && System.getProperties.containsKey("dl")) match {
-    case true => System.getProperty("dl").equalsIgnoreCase("dl")
-    case false => false
+  protected def log: Logger = {
+    if (logger == null) {
+      logger = LoggerFactory.getLogger(logName)
+    }
+    logger
   }
 
-  protected def log: Logger = {
-    if (log_ == null) {
-      log_ = Logger.getLogger(logName)
-    }
-    log_
-  }
+  def trace(msg: => String): Unit = if (log.isTraceEnabled) log.trace(msg)
+
+  def trace(msg: => String, err: Throwable): Unit = if (log.isTraceEnabled) log.trace(msg, err)
+
+  def debug(msg: => String): Unit = if (log.isDebugEnabled) log.debug(msg)
+
+  def debug(msg: => String, err: Throwable): Unit = if (log.isDebugEnabled) log.debug(msg, err)
+
+  def info(msg: => String): Unit = if (log.isInfoEnabled) log.info(msg)
+
+  def info(msg: => String, err: Throwable): Unit = if (log.isInfoEnabled) log.info(msg, err)
+
+  def warn(msg: => String): Unit = if (log.isWarnEnabled) log.warn(msg)
+
+  def warn(msg: => String, err: Throwable): Unit = if (log.isWarnEnabled) log.warn(msg, err)
+
+  def error(msg: String): Unit = log.error(msg)
+
+  def error(msg: String, err: Throwable): Unit = log.error(msg, err)
 }

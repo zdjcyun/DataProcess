@@ -3,8 +3,9 @@ package com.service.data.spark.streaming
 import java.text.SimpleDateFormat
 
 import com.service.data.commons.PubFunction
-import com.service.data.commons.dbs.DBConn
-import com.service.data.commons.utils.StringUtil
+import com.service.data.commons.dbs.DBConnection
+import com.service.data.commons.property.ServiceProperty
+import com.service.data.commons.utils.{CommUtil, StringUtil}
 import com.service.data.spark.streaming.process.TopicValueProcess
 import kafka.serializer.StringDecoder
 import org.apache.spark.streaming.kafka.KafkaUtils
@@ -32,10 +33,6 @@ class StreamingFromKafka {
 object StreamingFromKafka extends PubFunction {
   def main(args: Array[String]): Unit = {
     /**
-      * 参数配置信息。
-      */
-    var paramConfig: Map[String, String] = Map.empty[String, String]
-    /**
       * 主题对应的表。(主题， 表名， 字段分隔符)
       */
     var topicTables: Array[(String, String, String)] = Array.empty[(String, String, String)]
@@ -50,9 +47,8 @@ object StreamingFromKafka extends PubFunction {
       */
     var topicCodeMapping: Array[(String, String, String, String)] = Array.empty[(String, String, String, String)]
 
-    DBConn.setupAll()
+    DBConnection.setupAll()
     NamedDB('config) readOnly ({ implicit session =>
-      paramConfig = sql"select param_name,param_value from bfb_t_param_config_list".map(rs => Map(rs.string(1) -> rs.string(2))).list().apply().reduce(_ ++ _)
       topicTables = sql"select topic_name,table_name,field_split from bfb_t_topic_table_list".map(rs => (rs.string(1), rs.string(2), rs.string(3))).list().apply().toArray
       tableColumns = sql"select table_name,column_name,column_type,column_index,column_data from bfb_t_table_column_list".map(rs => (rs.string(1), rs.string(2), rs.string(3), rs.int(4), rs.string(5))).list().apply().toArray
       topicCodeMapping = sql"select topic_name,column_name,source_code,target_code from bfb_t_topic_code_mapping".map(rs => (rs.string(1), rs.string(2), rs.string(3), rs.string(4))).list().apply().toArray
@@ -63,23 +59,23 @@ object StreamingFromKafka extends PubFunction {
     val mappingMap = topicCodeMapping.groupBy(_._1).map(mapping => (mapping._1, mapping._2.map(x => (x._2, x._3, x._4))))
 
     val sparkConf = new SparkConf()
-      .setAppName(paramConfig.get("spark.streaming.application.name").getOrElse("SparkStreamingKafkaToDatabase"))
-      // IDEA本地直接提交到Yarn执行，需要在resources中添加Hadoop、Spark等的conf文件
-      // .setMaster("yarn-client").set("yarn.resourcemanager.hostname", "").set("spark.executor.instances", "2").setJars(Seq())
-      // 部署打包的时候需要去掉下面这行
-      // .setMaster("local[3]")
+      .setAppName(ServiceProperty.properties.get("spark.streaming.application.name").getOrElse("SparkStreamingKafkaToDatabase"))
+    // IDEA本地直接提交到Yarn执行，需要在resources中添加Hadoop、Spark等的conf文件
+    // .setMaster("yarn-client").set("yarn.resourcemanager.hostname", "").set("spark.executor.instances", "2").setJars(Seq())
+    // 部署打包的时候需要去掉下面这行
+    // .setMaster("local[3]")
 
-    val ssc = new StreamingContext(sparkConf, Seconds(paramConfig.get("spark.streaming.batch.duration").getOrElse("5").toLong))
+    val ssc = new StreamingContext(sparkConf, Seconds(ServiceProperty.properties.get("spark.streaming.batch.duration").getOrElse("5").toLong))
 
-    if (!"nocp".equalsIgnoreCase(paramConfig.get("spark.streaming.checkpoint.dir").getOrElse("nocp"))) {
-      ssc.checkpoint(paramConfig.get("spark.streaming.checkpoint.dir").get)
+    if (!"nocp".equalsIgnoreCase(ServiceProperty.properties.get("spark.streaming.checkpoint.dir").getOrElse("nocp"))) {
+      ssc.checkpoint(ServiceProperty.properties.get("spark.streaming.checkpoint.dir").get)
     }
 
     val kafkaParams = Map[String, String](
-      "bootstrap.servers" -> paramConfig("kafka.bootstrap.servers")
+      "bootstrap.servers" -> ServiceProperty.properties("kafka.bootstrap.servers")
     )
 
-    val topics = paramConfig("kafka.consumer.topics").split(",", -1)
+    val topics = ServiceProperty.properties("spark.streaming.consumer.topics").split(",", -1)
 
     topics.foreach(topic => {
       val lines = KafkaUtils.createDirectStream[String, String, StringDecoder, StringDecoder](ssc, kafkaParams, Set(topic)).map(_._2)
@@ -93,7 +89,7 @@ object StreamingFromKafka extends PubFunction {
             // 根据表名取字段
             val columns = columnMap(table._2)
             Future {
-              process(StreamingMessage(table, columns, data, mappingMap.get(topic).getOrElse(Array()), paramConfig.get(s"spark.${topic}.process.class").getOrElse("com.service.data.spark.streaming.process.DefaultTextProcess")))
+              process(StreamingMessage(table, columns, data, mappingMap.get(topic).getOrElse(Array()), ServiceProperty.properties.get(s"spark.${topic}.process.class").getOrElse("com.service.data.spark.streaming.process.DefaultTextProcess")))
             }
           })
         }
@@ -111,7 +107,7 @@ object StreamingFromKafka extends PubFunction {
     * @return
     */
   private def convert(column: ((String, String, Int, String), String)): Any = {
-    if (StringUtil.isEmpty(column._2)) {
+    if (CommUtil.isEmpty(column._2)) {
       ""
     } else {
       try {
@@ -168,7 +164,7 @@ object StreamingFromKafka extends PubFunction {
       } catch {
         case ex: Exception =>
           println(s"${SparkEnv.get.executorId}:${Thread.currentThread.getId}-${Thread.currentThread.getName}:${ex.getMessage}")
-          DBConn.setupAll()
+          DBConnection.setupAll()
       }
       try {
         // 将数据保存到云环境
