@@ -26,20 +26,32 @@ object KafkaStreamsTopicFilter extends App with PubFunction {
 
   val props = new Properties()
 
-  props.put(StreamsConfig.APPLICATION_ID_CONFIG, ServiceProperty.properties.get("kafka.streams.application.id").getOrElse("KafkaStreamsTopicFilter"))
+  // 相关参数配置
+  props.put(StreamsConfig.APPLICATION_ID_CONFIG, ServiceProperty.properties.get("kafka.streams.application.id").getOrElse("KafkaStreamsApplicationID"))
   props.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, ServiceProperty.properties.get("kafka.bootstrap.servers").get)
-
   props.put(StreamsConfig.KEY_SERDE_CLASS_CONFIG, Serdes.String().getClass)
   props.put(StreamsConfig.VALUE_SERDE_CLASS_CONFIG, Serdes.String().getClass)
 
   val builder: KStreamBuilder = new KStreamBuilder
 
-  ServiceProperty.properties.keySet.toArray.filter(k => !"kafka.streams.(.*).source.topic".r.findAllIn(k.toString).isEmpty).map(k => k.toString.split(RegexpEscape("."), -1)(1)).distinct.foreach(group => {
-    builder.stream(ServiceProperty.properties.get(s"kafka.streams.${group}.source.topic").get).filter(new Predicate[String, String] {
-      override def test(k: String, v: String): Boolean = {
-        !ServiceProperty.properties.get(s"kafka.streams.${group}.regex.string").get.r.findAllIn(v).isEmpty
-      }
-    }).to(ServiceProperty.properties.get(s"kafka.streams.${group}.target.topic").get)
+  ServiceProperty.properties.keySet.toArray
+    // 筛选满足指定格式的Key
+    .filter(k => !"kafka.streams.(.*).source.topic".r.findAllIn(k.toString).isEmpty)
+    // 截取指定位置的字符串，去重后得到相关分组
+    .map(k => k.toString.split(RegexpEscape("."), -1)(2)).distinct
+    // 对每一个组进行处理
+    .foreach(group => {
+    builder
+      // 找到该组中的数据源Topic
+      .stream(ServiceProperty.properties.get(s"kafka.streams.${group}.source.topic").get)
+      .filter(new Predicate[String, String] {
+        override def test(k: String, v: String): Boolean = {
+          // 筛选出该Topic中满足指定正则表达式的数据
+          !ServiceProperty.properties.get(s"kafka.streams.${group}.regex.string").get.r.findAllIn(v).isEmpty
+        }
+      })
+      // 将满足条件的数据写入到目标Topic
+      .to(ServiceProperty.properties.get(s"kafka.streams.${group}.target.topic").get)
   })
 
   val streams = new KafkaStreams(builder, props)
