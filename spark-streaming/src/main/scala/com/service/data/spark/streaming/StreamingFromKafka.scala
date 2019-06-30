@@ -63,12 +63,14 @@ object StreamingFromKafka extends PubFunction {
     val columnMap = tableColumns.groupBy(_._1).map(column => (column._1 -> column._2.sortWith(_._4 < _._4).map(x => (x._2, x._3, x._4, x._5))))
     val mappingMap = topicCodeMapping.groupBy(_._1).map(mapping => (mapping._1, mapping._2.map(x => (x._2, x._3, x._4))))
 
+    // 设置Hadoop用户名称
+    System.setProperty("HADOOP_USER_NAME", "hadoop")
     val sparkConf = new SparkConf()
       .setAppName(ServiceProperty.properties.get("spark.streaming.application.name").getOrElse("SparkStreamingKafkaToDatabase"))
       // IDEA本地直接提交到Yarn执行，需要在resources中添加Hadoop、Spark等的conf文件
-      // .setMaster("yarn-client").set("yarn.resourcemanager.hostname", "").set("spark.executor.instances", "2").setJars(Seq())
-      // 部署打包的时候需要去掉下面这行
-      .setMaster("local[3]")
+      .setMaster("yarn-client").set("yarn.resourcemanager.hostname", "").set("spark.executor.instances", "1").setJars(Seq())
+    // 部署打包的时候需要去掉下面这行
+    // .setMaster("local[3]")
 
     val ssc = new StreamingContext(sparkConf, Seconds(ServiceProperty.properties.get("spark.streaming.batch.duration").getOrElse("5").toLong))
 

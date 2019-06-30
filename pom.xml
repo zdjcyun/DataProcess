@@ -76,6 +76,11 @@
             <!-- Spark -->
             <dependency>
                 <groupId>org.apache.spark</groupId>
+                <artifactId>spark-sql_2.10</artifactId>
+                <version>${spark.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.spark</groupId>
                 <artifactId>spark-streaming_2.10</artifactId>
                 <version>${spark.version}</version>
             </dependency>
@@ -86,17 +91,17 @@
             </dependency>
             <dependency>
                 <groupId>org.apache.spark</groupId>
-                <artifactId>spark-sql_2.10</artifactId>
-                <version>${spark.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.spark</groupId>
                 <artifactId>spark-streaming-flume_2.10</artifactId>
                 <version>${spark.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.spark</groupId>
                 <artifactId>spark-streaming-flume-sink_2.10</artifactId>
+                <version>${spark.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.spark</groupId>
+                <artifactId>spark-yarn_2.10</artifactId>
                 <version>${spark.version}</version>
             </dependency>
 
