@@ -5,10 +5,15 @@ import java.text.SimpleDateFormat
 import com.service.data.commons.PubFunction
 import com.service.data.commons.dbs.DBConnection
 import com.service.data.commons.property.ServiceProperty
-import com.service.data.commons.utils.{CommUtil, StringUtil}
+import com.service.data.commons.utils.CommUtil
+import com.service.data.spark.streaming.offset.KafkaOffsetHandlerFactory
 import com.service.data.spark.streaming.process.TopicValueProcess
+import kafka.common.TopicAndPartition
+import kafka.message.MessageAndMetadata
 import kafka.serializer.StringDecoder
-import org.apache.spark.streaming.kafka.KafkaUtils
+import org.apache.kafka.clients.consumer.ConsumerConfig
+import org.apache.kafka.common.TopicPartition
+import org.apache.spark.streaming.kafka.{HasOffsetRanges, KafkaUtils}
 import org.apache.spark.streaming.{Seconds, StreamingContext}
 import org.apache.spark.{SparkConf, SparkEnv}
 import scalikejdbc._
@@ -49,9 +54,9 @@ object StreamingFromKafka extends PubFunction {
 
     DBConnection.setupAll()
     NamedDB('config) readOnly ({ implicit session =>
-      topicTables = sql"select topic_name,table_name,field_split from bfb_t_topic_table_list".map(rs => (rs.string(1), rs.string(2), rs.string(3))).list().apply().toArray
-      tableColumns = sql"select table_name,column_name,column_type,column_index,column_data from bfb_t_table_column_list".map(rs => (rs.string(1), rs.string(2), rs.string(3), rs.int(4), rs.string(5))).list().apply().toArray
-      topicCodeMapping = sql"select topic_name,column_name,source_code,target_code from bfb_t_topic_code_mapping".map(rs => (rs.string(1), rs.string(2), rs.string(3), rs.string(4))).list().apply().toArray
+      topicTables = sql"select topic_name,table_name,field_split from app_t_topic_table_list".map(rs => (rs.string(1), rs.string(2), rs.string(3))).list().apply().toArray
+      tableColumns = sql"select table_name,column_name,column_type,column_index,column_data from app_t_table_column_list".map(rs => (rs.string(1), rs.string(2), rs.string(3), rs.int(4), rs.string(5))).list().apply().toArray
+      topicCodeMapping = sql"select topic_name,column_name,source_code,target_code from app_t_topic_code_mapping".map(rs => (rs.string(1), rs.string(2), rs.string(3), rs.string(4))).list().apply().toArray
     })
 
     val tableMap = topicTables.map(table => Map(table._1 -> table)).reduce(_ ++ _)
@@ -60,10 +65,10 @@ object StreamingFromKafka extends PubFunction {
 
     val sparkConf = new SparkConf()
       .setAppName(ServiceProperty.properties.get("spark.streaming.application.name").getOrElse("SparkStreamingKafkaToDatabase"))
-    // IDEA本地直接提交到Yarn执行，需要在resources中添加Hadoop、Spark等的conf文件
-    // .setMaster("yarn-client").set("yarn.resourcemanager.hostname", "").set("spark.executor.instances", "2").setJars(Seq())
-    // 部署打包的时候需要去掉下面这行
-    // .setMaster("local[3]")
+      // IDEA本地直接提交到Yarn执行，需要在resources中添加Hadoop、Spark等的conf文件
+      // .setMaster("yarn-client").set("yarn.resourcemanager.hostname", "").set("spark.executor.instances", "2").setJars(Seq())
+      // 部署打包的时候需要去掉下面这行
+      .setMaster("local[3]")
 
     val ssc = new StreamingContext(sparkConf, Seconds(ServiceProperty.properties.get("spark.streaming.batch.duration").getOrElse("5").toLong))
 
@@ -71,17 +76,38 @@ object StreamingFromKafka extends PubFunction {
       ssc.checkpoint(ServiceProperty.properties.get("spark.streaming.checkpoint.dir").get)
     }
 
+    // Kafka配置参数
     val kafkaParams = Map[String, String](
-      "bootstrap.servers" -> ServiceProperty.properties("kafka.bootstrap.servers")
+      ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG -> ServiceProperty.properties.get("kafka.bootstrap.servers").getOrElse(""),
+      ConsumerConfig.GROUP_ID_CONFIG -> ServiceProperty.properties.get("kafka.consumer.group.id").getOrElse("data-service-default-group"),
+      ConsumerConfig.AUTO_OFFSET_RESET_CONFIG -> ServiceProperty.properties.get("kafka.consumer.offset.reset").getOrElse("smallest"),
+      ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG -> "org.apache.kafka.common.serialization.StringDeserializer",
+      ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG -> "org.apache.kafka.common.serialization.StringDeserializer",
+      ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG -> "false"
     )
 
+    // 消费的主题
     val topics = ServiceProperty.properties("spark.streaming.consumer.topics").split(",", -1)
 
+    // 获取Kafka偏移量
+    val fromOffsets: Map[TopicAndPartition, Long] = KafkaOffsetHandlerFactory.getKafkaOffsetHandler().readOffset(kafkaParams(ConsumerConfig.GROUP_ID_CONFIG).toString, topics)
+
     topics.foreach(topic => {
-      val lines = KafkaUtils.createDirectStream[String, String, StringDecoder, StringDecoder](ssc, kafkaParams, Set(topic)).map(_._2)
-      lines.foreachRDD(rdd => {
+      // 根据偏移量获取Kafka的数据
+      val stream = if (fromOffsets.isEmpty) {
+        KafkaUtils.createDirectStream[String, String, StringDecoder, StringDecoder](ssc, kafkaParams, Set(topic))
+      } else {
+        //这个会将 kafka 的消息进行 transform，最终 kafka 的数据都会变成 (topic_name, message) 这样的 tuple
+        val messageHandler = (mmd: MessageAndMetadata[String, String]) => (mmd.topic, mmd.message())
+        KafkaUtils.createDirectStream[String, String, StringDecoder, StringDecoder, (String, String)](ssc, kafkaParams, fromOffsets, messageHandler)
+      }
+      stream.foreachRDD(rdd => {
         // 无数据，不执行
         if (!rdd.isEmpty()) {
+          // 记录偏移量
+          val offsetRanges = rdd.asInstanceOf[HasOffsetRanges].offsetRanges
+          offsetRanges.foreach(println)
+
           // Partition的数据在Executor上运行
           rdd.foreachPartition(data => {
             // 根据主题取表
@@ -89,9 +115,11 @@ object StreamingFromKafka extends PubFunction {
             // 根据表名取字段
             val columns = columnMap(table._2)
             Future {
-              process(StreamingMessage(table, columns, data, mappingMap.get(topic).getOrElse(Array()), ServiceProperty.properties.get(s"spark.${topic}.process.class").getOrElse("com.service.data.spark.streaming.process.DefaultTextProcess")))
+              process(StreamingMessage(table, columns, data.map(_._2), mappingMap.get(topic).getOrElse(Array()), ServiceProperty.properties.get(s"spark.${topic}.process.class").getOrElse("com.service.data.spark.streaming.process.DefaultTextProcess")))
             }
           })
+          // 提交偏移量
+          KafkaOffsetHandlerFactory.getKafkaOffsetHandler().writeOffset(kafkaParams(ConsumerConfig.GROUP_ID_CONFIG).toString, topics, offsetRanges)
         }
       })
     })
@@ -159,7 +187,7 @@ object StreamingFromKafka extends PubFunction {
       try {
         // 验证数据源是否初始化
         NamedDB('config) localTx { implicit session =>
-          sql"select count(*) from bfb_t_param_config_list".map(rs => rs.int(1)).single().apply()
+          sql"select count(*) from app_t_param_config_list".map(rs => rs.int(1)).single().apply()
         }
       } catch {
         case ex: Exception =>

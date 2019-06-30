@@ -13,7 +13,7 @@
 
     <modules>
         <module>commons</module>
-        <module>kafka-streams</module>
+<!--        <module>kafka-streams</module>-->
         <module>spark-streaming</module>
     </modules>
 
