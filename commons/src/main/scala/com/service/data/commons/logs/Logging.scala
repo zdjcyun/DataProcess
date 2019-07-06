@@ -9,29 +9,25 @@ import org.slf4j.{Logger, LoggerFactory}
   */
 trait Logging {
 
-  private lazy val logger: Logger = LoggerFactory.getLogger(logName)
+  lazy val logger: Logger = LoggerFactory.getLogger(getClass.getName.stripSuffix("$"))
 
-  private def logName = {
-    this.getClass.getName.stripSuffix("$")
-  }
+  def trace(msg: => String): Unit = if (logger.isTraceEnabled) logger.trace(msg)
 
-  def trace(msg: String): Unit = if (logger.isTraceEnabled) logger.trace(msg)
+  def trace(msg: => String, err: Throwable): Unit = if (logger.isTraceEnabled) logger.trace(msg, err)
 
-  def trace(msg: String, err: Throwable): Unit = if (logger.isTraceEnabled) logger.trace(msg, err)
+  def debug(msg: => String): Unit = if (logger.isDebugEnabled) logger.debug(msg)
 
-  def debug(msg: String): Unit = if (logger.isDebugEnabled) logger.debug(msg)
+  def debug(msg: => String, err: Throwable): Unit = if (logger.isDebugEnabled) logger.debug(msg, err)
 
-  def debug(msg: String, err: Throwable): Unit = if (logger.isDebugEnabled) logger.debug(msg, err)
+  def info(msg: => String): Unit = if (logger.isInfoEnabled) logger.info(msg)
 
-  def info(msg: String): Unit = if (logger.isInfoEnabled) logger.info(msg)
+  def info(msg: => String, err: Throwable): Unit = if (logger.isInfoEnabled) logger.info(msg, err)
 
-  def info(msg: String, err: Throwable): Unit = if (logger.isInfoEnabled) logger.info(msg, err)
+  def warn(msg: => String): Unit = if (logger.isWarnEnabled) logger.warn(msg)
 
-  def warn(msg: String): Unit = if (logger.isWarnEnabled) logger.warn(msg)
+  def warn(msg: => String, err: Throwable): Unit = if (logger.isWarnEnabled) logger.warn(msg, err)
 
-  def warn(msg: String, err: Throwable): Unit = if (logger.isWarnEnabled) logger.warn(msg, err)
+  def error(msg: => String): Unit = if (logger.isErrorEnabled) logger.error(msg)
 
-  def error(msg: String): Unit = if (logger.isErrorEnabled) logger.error(msg)
-
-  def error(msg: String, err: Throwable): Unit = if (logger.isErrorEnabled) logger.error(msg, err)
+  def error(msg: => String, err: Throwable): Unit = if (logger.isErrorEnabled) logger.error(msg, err)
 }
