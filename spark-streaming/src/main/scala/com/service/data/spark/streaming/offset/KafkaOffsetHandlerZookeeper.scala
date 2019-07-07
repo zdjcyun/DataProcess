@@ -1,10 +1,9 @@
 package com.service.data.spark.streaming.offset
-
 import com.service.data.commons.property.ServiceProperty
-import kafka.common.TopicAndPartition
 import kafka.utils.{ZKGroupTopicDirs, ZkUtils}
 import org.I0Itec.zkclient.ZkClient
-import org.apache.spark.streaming.kafka.OffsetRange
+import org.apache.kafka.common.TopicPartition
+import org.apache.spark.streaming.kafka010.OffsetRange
 
 /**
   * @author 伍鲜
@@ -20,7 +19,7 @@ class KafkaOffsetHandlerZookeeper extends KafkaOffsetHandler {
     * @param topic
     * @return
     */
-  override def readOffset(group: String, topic: String): Map[TopicAndPartition, Long] = {
+  override def readOffset(group: String, topic: String): Map[TopicPartition, Long] = {
     // 创建一个 ZKGroupTopicDirs 对象
     val topicDirs = new ZKGroupTopicDirs(group = group, topic = topic)
 
@@ -34,12 +33,12 @@ class KafkaOffsetHandlerZookeeper extends KafkaOffsetHandler {
     val children = client.countChildren(s"${topicPath}")
 
     //如果 zookeeper 中有保存 offset，我们会利用这个 offset 作为 kafkaStream 的起始位置
-    var fromOffsets: Map[TopicAndPartition, Long] = Map()
+    var fromOffsets: Map[TopicPartition, Long] = Map()
 
     for (i <- 0 until children) {
       val partitionOffset = client.readData[String](s"${topicDirs.consumerOffsetDir}/${i}")
       //将不同 partition 对应的 offset 增加到 fromOffsets 中
-      fromOffsets += (new TopicAndPartition(topic, i) -> partitionOffset.toLong)
+      fromOffsets += (new TopicPartition(topic, i) -> partitionOffset.toLong)
     }
 
     // 最终得到的偏移量信息

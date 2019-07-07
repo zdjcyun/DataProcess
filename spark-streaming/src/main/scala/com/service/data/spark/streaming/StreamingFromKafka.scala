@@ -13,10 +13,17 @@ import kafka.message.MessageAndMetadata
 import kafka.serializer.StringDecoder
 import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.kafka.common.TopicPartition
-import org.apache.spark.streaming.kafka.{HasOffsetRanges, KafkaUtils}
+import org.apache.spark.streaming.kafka010.KafkaUtils
 import org.apache.spark.streaming.{Seconds, StreamingContext}
 import org.apache.spark.{SparkConf, SparkEnv}
 import scalikejdbc._
+import org.apache.kafka.clients.consumer.ConsumerConfig
+import org.apache.kafka.common.TopicPartition
+import org.apache.kafka.common.serialization.StringDeserializer
+import org.apache.spark.streaming.kafka010.ConsumerStrategies._
+import org.apache.spark.streaming.kafka010.LocationStrategies._
+import org.apache.spark.streaming.kafka010.{HasOffsetRanges, KafkaUtils}
+import org.apache.spark.streaming.{Seconds, StreamingContext}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -92,17 +99,20 @@ object StreamingFromKafka extends PubFunction {
     val topics = ServiceProperty.properties("spark.streaming.consumer.topics").split(",", -1)
 
     // 获取Kafka偏移量
-    val fromOffsets: Map[TopicAndPartition, Long] = KafkaOffsetHandlerFactory.getKafkaOffsetHandler().readOffset(kafkaParams(ConsumerConfig.GROUP_ID_CONFIG).toString, topics)
+    val fromOffsets: Map[TopicPartition, Long] = KafkaOffsetHandlerFactory.getKafkaOffsetHandler().readOffset(kafkaParams(ConsumerConfig.GROUP_ID_CONFIG).toString, topics)
 
     topics.foreach(topic => {
+
+      // 获取Kafka偏移量
+      val fromOffsets: Map[TopicPartition, Long] = KafkaOffsetHandlerFactory.getKafkaOffsetHandler().readOffset(kafkaParams(ConsumerConfig.GROUP_ID_CONFIG).toString, topics)
+
       // 根据偏移量获取Kafka的数据
-      val stream = if (fromOffsets.isEmpty) {
-        KafkaUtils.createDirectStream[String, String, StringDecoder, StringDecoder](ssc, kafkaParams, Set(topic))
+      implicit val stream = if (fromOffsets.size > 0) {
+        KafkaUtils.createDirectStream[String, String](ssc, PreferConsistent, Subscribe[String, String](topics, kafkaParams, fromOffsets))
       } else {
-        //这个会将 kafka 的消息进行 transform，最终 kafka 的数据都会变成 (topic_name, message) 这样的 tuple
-        val messageHandler = (mmd: MessageAndMetadata[String, String]) => (mmd.topic, mmd.message())
-        KafkaUtils.createDirectStream[String, String, StringDecoder, StringDecoder, (String, String)](ssc, kafkaParams, fromOffsets, messageHandler)
+        KafkaUtils.createDirectStream[String, String](ssc, PreferConsistent, Subscribe[String, String](topics, kafkaParams))
       }
+
       stream.foreachRDD(rdd => {
         // 无数据，不执行
         if (!rdd.isEmpty()) {
@@ -117,7 +127,7 @@ object StreamingFromKafka extends PubFunction {
             // 根据表名取字段
             val columns = columnMap(table._2)
             Future {
-              process(StreamingMessage(table, columns, data.map(_._2), mappingMap.get(topic).getOrElse(Array()), ServiceProperty.properties.get(s"spark.${topic}.process.class").getOrElse("com.service.data.spark.streaming.process.DefaultTextProcess")))
+              process(StreamingMessage(table, columns, data.map(_.value()), mappingMap.get(topic).getOrElse(Array()), ServiceProperty.properties.get(s"spark.${topic}.process.class").getOrElse("com.service.data.spark.streaming.process.DefaultTextProcess")))
             }
           })
           // 提交偏移量

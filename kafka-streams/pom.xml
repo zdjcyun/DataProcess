@@ -1,8 +1,8 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <parent>
-        <artifactId>DataService-FusionInsight</artifactId>
         <groupId>com.service.data</groupId>
+        <artifactId>DataService-Framework</artifactId>
         <version>1.0-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
@@ -14,14 +14,14 @@
     <inceptionYear>2018</inceptionYear>
 
     <properties>
-        <kafka.version>0.10.0.0</kafka.version>
+        <kafka.version>2.1.0</kafka.version>
     </properties>
 
     <dependencies>
         <!-- Kafka -->
         <dependency>
             <groupId>org.apache.kafka</groupId>
-            <artifactId>kafka_2.10</artifactId>
+            <artifactId>kafka_2.11</artifactId>
             <version>${kafka.version}</version>
         </dependency>
         <dependency>

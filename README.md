@@ -4,20 +4,12 @@
 基于大数据平台的数据处理服务框架。
 使用Flume组件采集系统日志，并将采集到的日志存放到Kafka消息队列，供SparkStreaming程序消费使用。软件的目的是实现日志文件的实时采集，并实时加工处理到数据库，供其他服务程序使用。
 
-#### 依赖组件
-项目基于FusionInsight HD V100R002C70SPC200平台，依赖以下组件：  
-1. Java: 1.8  
-2. Scala: 2.10.4
-3. Flume: 1.6.0
-4. Kafka: 0.8.2.1 / 0.10.0.0
-5. Spark: 1.5.1
-
 #### 软件架构
 软件结构如下：  
 DataService-Framework 项目根目录  
 + commons：公共功能模块，提供配置文件读取、数据库连接、日志打印、工具类等公共功能，以供其他模块调用。  
 + kafka-streams：主题数据过滤模块，Kafka自带的流处理功能，业务系统记录的日志如果包含了大量的：程序异常日志、数据库操作日志、调试日志等日志信息，而采集的数据只需要日志文件中的特定数据的日志记录，那么对于我们采集到的日志来说，可能会有90%以上的日志都是垃圾数据，但是Flume组件没有提供日志过滤功能，而Spark程序又不应该消费这些数据。这时就需要提供一个中间层，将Flume采集到的Topic1的日志中满足条件的数据筛选出来放到Topic2中，Spark程序只需要消费Topic2的数据即可，过滤条件按照正则表达式进行配置。这样Spark消费Topic2的数据都是我们需要的数据，并且我们可以及时的清理掉Topic1的数据以释放空间。
-+ spark-kafka：Spark程序处理模块，通过SparkStreaming程序，准实时消费Kafka中的数据，经过字段数据解析、码值标准化处理等操作后，落地到DB中，供其他程序、服务使用。
++ spark-streaming：Spark程序处理模块，通过SparkStreaming程序，准实时消费Kafka中的数据，经过字段数据解析、码值标准化处理等操作后，落地到DB中，供其他程序、服务使用。
 
 #### 功能扩展
 目前，软件实现了Flume数据采集、Kafka主题数据过滤、SparkStreaming实时数据处理。但是SparkStreaming的数据处理只实现了代码值标准化等基础功能。并且，目前默认支持的采集日志格式只有两种：分隔符分隔字段的数据、JSON格式的数据。  
@@ -31,29 +23,29 @@ DataService-Framework 项目根目录
 软件开发打包文档：[软件开发打包文档.docx](works/docs/%E8%BD%AF%E4%BB%B6%E5%BC%80%E5%8F%91%E6%89%93%E5%8C%85%E6%96%87%E6%A1%A3.docx)  
 
 #### 部分截图
-Flume服务端配置文件下载
+Flume服务端配置文件下载  
 ![](works/images/007.png)  
-Flume服务端配置文件上传
+Flume服务端配置文件上传  
 ![](works/images/008.png)  
-Flume服务端配置文件生效
+Flume服务端配置文件生效  
 ![](works/images/012.png)  
-Flume客户端软件下载
+Flume客户端软件下载  
 ![](works/images/003.png)  
-Flume客户端采集配置
+Flume客户端采集配置  
 ![](works/images/013.png)  
-Kafka Topic监控
+Kafka Topic监控  
 ![](works/images/015.png)  
-数据库配置项配置
+数据库配置项配置  
 ![](works/images/020.png)  
-表结构配置
+表结构配置  
 ![](works/images/022.png)  
-Spark on Yarn 监控
+Spark on Yarn 监控  
 ![](works/images/019.png)  
-产生分隔符分隔的数据
+产生分隔符分隔的数据  
 ![](works/images/024.png)  
-产生JSON格式数据
+产生JSON格式数据  
 ![](works/images/025.png)  
-数据处理结果验证
+数据处理结果验证  
 ![](works/images/026.png)  
 
 #### 安装教程

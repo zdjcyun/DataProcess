@@ -1,12 +1,13 @@
-package com.service.data.kafka.streams.streams
+package com.service.data.kafka.streams
 
+import java.time.Duration
 import java.util.Properties
 
 import com.service.data.commons.PubFunction
 import com.service.data.commons.property.ServiceProperty
 import org.apache.kafka.common.serialization.Serdes
-import org.apache.kafka.streams.kstream.{KStreamBuilder, Predicate}
-import org.apache.kafka.streams.{KafkaStreams, StreamsConfig}
+import org.apache.kafka.streams.kstream.Predicate
+import org.apache.kafka.streams.{KafkaStreams, StreamsBuilder, StreamsConfig}
 
 /**
   * @author 伍鲜
@@ -29,10 +30,10 @@ object KafkaStreamsTopicFilter extends App with PubFunction {
   // 相关参数配置
   props.put(StreamsConfig.APPLICATION_ID_CONFIG, ServiceProperty.properties.get("kafka.streams.application.id").getOrElse("KafkaStreamsApplicationID"))
   props.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, ServiceProperty.properties.get("kafka.bootstrap.servers").get)
-  props.put(StreamsConfig.KEY_SERDE_CLASS_CONFIG, Serdes.String().getClass)
-  props.put(StreamsConfig.VALUE_SERDE_CLASS_CONFIG, Serdes.String().getClass)
+  props.put(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG, Serdes.String().getClass)
+  props.put(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG, Serdes.String().getClass)
 
-  val builder: KStreamBuilder = new KStreamBuilder
+  val builder: StreamsBuilder = new StreamsBuilder
 
   ServiceProperty.properties.keySet.toArray
     // 筛选满足指定格式的Key
@@ -54,6 +55,10 @@ object KafkaStreamsTopicFilter extends App with PubFunction {
       .to(ServiceProperty.properties.get(s"kafka.streams.${group}.target.topic").get)
   })
 
-  val streams = new KafkaStreams(builder, props)
+  val streams = new KafkaStreams(builder.build(), props)
   streams.start()
+
+  sys.ShutdownHookThread {
+    streams.close(Duration.ofSeconds(10))
+  }
 }

@@ -3,8 +3,8 @@ package com.service.data.spark.streaming.offset
 import java.util.ServiceLoader
 
 import com.service.data.commons.property.ServiceProperty
-import kafka.common.TopicAndPartition
-import org.apache.spark.streaming.kafka.OffsetRange
+import org.apache.kafka.common.TopicPartition
+import org.apache.spark.streaming.kafka010.OffsetRange
 
 /**
   * @author 伍鲜
@@ -20,7 +20,7 @@ trait KafkaOffsetHandler {
     * @param topic
     * @return
     */
-  def readOffset(group: String, topic: String): Map[TopicAndPartition, Long]
+  def readOffset(group: String, topic: String): Map[TopicPartition, Long]
 
   /**
     * 读取偏移量
@@ -29,8 +29,8 @@ trait KafkaOffsetHandler {
     * @param topics
     * @return
     */
-  def readOffset(group: String, topics: Seq[String]): Map[TopicAndPartition, Long] = {
-    var fromOffsets: Map[TopicAndPartition, Long] = Map()
+  def readOffset(group: String, topics: Seq[String]): Map[TopicPartition, Long] = {
+    var fromOffsets: Map[TopicPartition, Long] = Map()
 
     topics.foreach(topic => {
       fromOffsets ++= readOffset(group, topic)

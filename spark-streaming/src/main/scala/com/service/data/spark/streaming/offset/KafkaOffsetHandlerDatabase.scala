@@ -3,8 +3,8 @@ package com.service.data.spark.streaming.offset
 import com.service.data.commons.dbs.DBConnectionPool
 import com.service.data.commons.property.ServiceProperty
 import com.service.data.commons.tools.IdWorker
-import kafka.common.TopicAndPartition
-import org.apache.spark.streaming.kafka.OffsetRange
+import org.apache.kafka.common.TopicPartition
+import org.apache.spark.streaming.kafka010.OffsetRange
 import scalikejdbc._
 
 /**
@@ -23,12 +23,12 @@ class KafkaOffsetHandlerDatabase extends KafkaOffsetHandler {
     * @param topic
     * @return
     */
-  override def readOffset(group: String, topic: String): Map[TopicAndPartition, Long] = {
-    var fromOffsets: Map[TopicAndPartition, Long] = Map()
+  override def readOffset(group: String, topic: String): Map[TopicPartition, Long] = {
+    var fromOffsets: Map[TopicPartition, Long] = Map()
 
     DBConnectionPool.getNamedDB(symbol) readOnly ({ implicit session =>
       sql"select partition_num, until_offset from app_t_kafka_offset_list where group_id = ${group} and topic_name = ${topic}".map(rs => (rs.int(1), rs.long(2))).list().apply().foreach(record => {
-        fromOffsets += (new TopicAndPartition(topic, record._1) -> record._2)
+        fromOffsets += (new TopicPartition(topic, record._1) -> record._2)
       })
     })
 
