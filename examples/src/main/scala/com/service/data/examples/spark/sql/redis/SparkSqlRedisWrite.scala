@@ -1,8 +1,7 @@
-package com.service.data.examples.spark.sql
+package com.service.data.examples.spark.sql.redis
 
 import com.service.data.spark.sql.utils.{RedisUtil, SparkSqlUtil}
 import org.apache.spark.sql.SaveMode
-
 
 /**
   * @author 伍鲜

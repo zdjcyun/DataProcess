@@ -152,6 +152,13 @@
                 <version>2.3.1</version>
             </dependency>
 
+            <!-- MongoDB -->
+            <dependency>
+                <groupId>org.mongodb.spark</groupId>
+                <artifactId>mongo-spark-connector_2.11</artifactId>
+                <version>2.2.7</version>
+            </dependency>
+
             <!-- DataService -->
             <dependency>
                 <groupId>com.service.data</groupId>

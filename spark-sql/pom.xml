@@ -28,6 +28,10 @@
             <groupId>com.redislabs</groupId>
             <artifactId>spark-redis</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.mongodb.spark</groupId>
+            <artifactId>mongo-spark-connector_2.11</artifactId>
+        </dependency>
 
         <!-- DataService -->
         <dependency>
