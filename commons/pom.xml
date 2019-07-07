@@ -51,5 +51,11 @@
             <groupId>com.github.noraui</groupId>
             <artifactId>ojdbc7</artifactId>
         </dependency>
+
+        <!-- Redis -->
+        <dependency>
+            <groupId>redis.clients</groupId>
+            <artifactId>jedis</artifactId>
+        </dependency>
     </dependencies>
 </project>

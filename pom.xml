@@ -13,7 +13,9 @@
 
     <modules>
         <module>commons</module>
+        <module>examples</module>
         <module>kafka-streams</module>
+        <module>spark-sql</module>
         <module>spark-streaming</module>
     </modules>
 
@@ -29,6 +31,7 @@
 
         <mysql.version>5.1.38</mysql.version>
         <oracle.version>12.1.0.2</oracle.version>
+        <jedis.version>3.0.1</jedis.version>
     </properties>
 
     <repositories>
@@ -136,10 +139,38 @@
                 <version>${oracle.version}</version>
             </dependency>
 
+            <!-- Redis -->
+            <dependency>
+                <groupId>redis.clients</groupId>
+                <artifactId>jedis</artifactId>
+                <version>${jedis.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.redislabs</groupId>
+                <artifactId>spark-redis</artifactId>
+                <version>2.3.1</version>
+            </dependency>
+
             <!-- DataService -->
             <dependency>
                 <groupId>com.service.data</groupId>
                 <artifactId>commons</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.service.data</groupId>
+                <artifactId>kafka-streams</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.service.data</groupId>
+                <artifactId>spark-sql</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.service.data</groupId>
+                <artifactId>spark-streaming</artifactId>
                 <version>${project.version}</version>
             </dependency>
         </dependencies>

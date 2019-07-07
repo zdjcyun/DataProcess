@@ -5,8 +5,8 @@
         <artifactId>DataService-Framework</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
-    <artifactId>spark-streaming</artifactId>
-    <name>DataService Spark Streaming</name>
+    <artifactId>spark-sql</artifactId>
+    <name>DataService Spark SQL</name>
 
     <modelVersion>4.0.0</modelVersion>
 
@@ -16,23 +16,23 @@
         <!-- Spark -->
         <dependency>
             <groupId>org.apache.spark</groupId>
-            <artifactId>spark-streaming_2.11</artifactId>
+            <artifactId>spark-sql_2.11</artifactId>
             <!--打包部署的时候需要放开注释-->
             <!--<scope>provided</scope>-->
         </dependency>
         <dependency>
             <groupId>org.apache.spark</groupId>
-            <artifactId>spark-streaming-kafka-0-8_2.11</artifactId>
+            <artifactId>spark-yarn_2.11</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.apache.spark</groupId>
-            <artifactId>spark-streaming-kafka-0-10_2.11</artifactId>
+            <groupId>com.redislabs</groupId>
+            <artifactId>spark-redis</artifactId>
         </dependency>
 
         <!-- DataService -->
         <dependency>
             <groupId>com.service.data</groupId>
-            <artifactId>spark-sql</artifactId>
+            <artifactId>commons</artifactId>
         </dependency>
     </dependencies>
 </project>
