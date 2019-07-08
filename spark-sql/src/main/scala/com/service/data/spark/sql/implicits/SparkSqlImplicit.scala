@@ -13,6 +13,7 @@ object SparkSqlImplicit {
     * @param ds
     */
   implicit class DatasetUtil(val ds: Dataset[_]) extends Logging {
+
     /**
       * 判断是否包含指定的列
       *
@@ -33,12 +34,26 @@ object SparkSqlImplicit {
       columnNames.map(columnName => Try(ds(columnName)).isSuccess).reduce(_ && _)
     }
 
+    /**
+      * 通过debug打印数据集内容
+      */
     def debugShow(): Unit = debugShow(20)
 
+    /**
+      * 通过debug打印数据集内容
+      *
+      * @param numRows 打印多少行
+      */
     def debugShow(numRows: Int): Unit = debugShow(numRows, false)
 
+    /**
+      * 通过debug打印数据集内容
+      *
+      * @param numRows  打印多少行
+      * @param truncate 是否截取超长内容
+      */
     def debugShow(numRows: Int, truncate: Boolean): Unit = {
-      debug("数据集的内容为：\n" + SparkDatasetUtil.debugShow(ds, numRows, truncate))
+      debug("数据集的内容为：\n" + SparkDatasetUtil.showString(ds, numRows, truncate))
     }
   }
 
