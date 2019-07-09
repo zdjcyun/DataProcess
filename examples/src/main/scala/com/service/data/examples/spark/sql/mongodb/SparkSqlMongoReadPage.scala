@@ -2,7 +2,7 @@ package com.service.data.examples.spark.sql.mongodb
 
 import com.service.data.spark.sql.implicits.SparkSqlImplicit._
 import com.service.data.spark.sql.paging.SparkMongoPaging
-import com.service.data.spark.sql.utils.{MongoUtil, SparkSqlUtil}
+import com.service.data.spark.sql.utils.SparkSqlUtil
 import org.bson.Document
 
 /**

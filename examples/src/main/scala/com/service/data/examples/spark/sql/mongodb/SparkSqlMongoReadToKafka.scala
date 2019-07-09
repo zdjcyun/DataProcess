@@ -1,6 +1,6 @@
 package com.service.data.examples.spark.sql.mongodb
 
-import com.service.data.examples.kafka.producer.SimpleProducer
+import com.service.data.kafka.clients.producer.SimpleProducer
 import com.service.data.spark.sql.paging.SparkMongoPaging
 import com.service.data.spark.sql.utils.SparkSqlUtil
 import org.apache.kafka.clients.producer.ProducerRecord

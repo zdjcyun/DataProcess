@@ -14,7 +14,10 @@
     <modules>
         <module>commons</module>
         <module>examples</module>
+
+        <module>kafka-clients</module>
         <module>kafka-streams</module>
+
         <module>spark-sql</module>
         <module>spark-streaming</module>
     </modules>
@@ -165,11 +168,18 @@
                 <artifactId>commons</artifactId>
                 <version>${project.version}</version>
             </dependency>
+
+            <dependency>
+                <groupId>com.service.data</groupId>
+                <artifactId>kafka-clients</artifactId>
+                <version>${project.version}</version>
+            </dependency>
             <dependency>
                 <groupId>com.service.data</groupId>
                 <artifactId>kafka-streams</artifactId>
                 <version>${project.version}</version>
             </dependency>
+
             <dependency>
                 <groupId>com.service.data</groupId>
                 <artifactId>spark-sql</artifactId>

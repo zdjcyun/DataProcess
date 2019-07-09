@@ -16,6 +16,10 @@
         <!-- DataService -->
         <dependency>
             <groupId>com.service.data</groupId>
+            <artifactId>kafka-clients</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.service.data</groupId>
             <artifactId>spark-sql</artifactId>
         </dependency>
         <dependency>

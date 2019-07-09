@@ -57,7 +57,7 @@ class SparkMongoPaging private() {
   /**
     * 当前分页的objectId下限（不包含）
     */
-  private var minimumObjectId: String = _
+  @BeanProperty var minimumObjectId: String = _
 
   /**
     * SparkContext
