@@ -1,6 +1,6 @@
 package com.service.data.examples.spark.sql.mongodb
 
-import com.service.data.spark.sql.utils.{MongoUtil, SparkSqlUtil}
+import com.service.data.spark.sql.utils.{MongoUtil, SparkSessionUtil}
 
 /**
   * @author 伍鲜
@@ -9,7 +9,7 @@ import com.service.data.spark.sql.utils.{MongoUtil, SparkSqlUtil}
   */
 object SparkSqlMongoWrite {
   def main(args: Array[String]): Unit = {
-    implicit val spark = SparkSqlUtil.getSparkSession()
+    implicit val spark = SparkSessionUtil.getSparkSession()
     import spark.implicits._
 
     val list = List("""{"name":"wuxian","age":31, "sex":"01"}""", """{"name":"winson","age":31,"sex":"02"}""")

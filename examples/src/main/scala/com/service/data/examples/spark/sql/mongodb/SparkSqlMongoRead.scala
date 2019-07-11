@@ -1,7 +1,7 @@
 package com.service.data.examples.spark.sql.mongodb
 
 import com.service.data.spark.sql.implicits.SparkSqlImplicit._
-import com.service.data.spark.sql.utils.{MongoUtil, SparkSqlUtil}
+import com.service.data.spark.sql.utils.{MongoUtil, SparkSessionUtil}
 
 /**
   * @author 伍鲜
@@ -10,7 +10,7 @@ import com.service.data.spark.sql.utils.{MongoUtil, SparkSqlUtil}
   */
 object SparkSqlMongoRead {
   def main(args: Array[String]): Unit = {
-    implicit val spark = SparkSqlUtil.getSparkSession()
+    implicit val spark = SparkSessionUtil.getSparkSession()
 
     // 读取MongoDB
     val df = MongoUtil.loadFromMongoDB("DocTest")

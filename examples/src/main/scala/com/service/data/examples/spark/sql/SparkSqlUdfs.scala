@@ -5,9 +5,9 @@ import com.service.data.spark.sql.utils.SparkSessionUtil
 /**
   * @author 伍鲜
   *
-  *         读取List形成Dataset/DataFrame
+  *         Spark SQL 自定义函数
   */
-object SparkSqlReadList {
+object SparkSqlUdfs {
   def main(args: Array[String]): Unit = {
     implicit val spark = SparkSessionUtil.getSparkSession()
     import spark.implicits._
@@ -20,6 +20,8 @@ object SparkSqlReadList {
     df.createOrReplaceTempView("users")
     spark.sql("select name, max(age) as max_age from users group by name").createOrReplaceTempView("users_age")
 
-    spark.sql("select t1.name, t2.max_age from users t1 left join users_age t2 on t1.name = t2.name").show()
+    spark.sql("select GenerateID(), t1.name, t2.max_age from users t1 left join users_age t2 on t1.name = t2.name").show()
+
+    spark.sql("select 27138893.600000 * ((100.000000 * 1.000000)/(1.000000*48337.32))").show()
   }
 }

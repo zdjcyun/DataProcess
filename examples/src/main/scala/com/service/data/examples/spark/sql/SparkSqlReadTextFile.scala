@@ -1,6 +1,6 @@
 package com.service.data.examples.spark.sql
 
-import com.service.data.spark.sql.utils.SparkSqlUtil
+import com.service.data.spark.sql.utils.SparkSessionUtil
 
 /**
   * @author 伍鲜
@@ -9,7 +9,7 @@ import com.service.data.spark.sql.utils.SparkSqlUtil
   */
 object SparkSqlReadTextFile {
   def main(args: Array[String]): Unit = {
-    implicit val spark = SparkSqlUtil.getSparkSession()
+    implicit val spark = SparkSessionUtil.getSparkSession()
     import spark.implicits._
 
     val rdd1 = spark.read.text("file:///E:/Gitee/DataService-Framework/LICENSE").toJSON.map(x => {

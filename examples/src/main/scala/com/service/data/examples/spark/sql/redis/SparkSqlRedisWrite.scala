@@ -1,6 +1,6 @@
 package com.service.data.examples.spark.sql.redis
 
-import com.service.data.spark.sql.utils.{RedisUtil, SparkSqlUtil}
+import com.service.data.spark.sql.utils.{RedisUtil, SparkSessionUtil}
 import org.apache.spark.sql.SaveMode
 
 /**
@@ -10,7 +10,7 @@ import org.apache.spark.sql.SaveMode
   */
 object SparkSqlRedisWrite {
   def main(args: Array[String]): Unit = {
-    implicit val spark = SparkSqlUtil.getSparkSession()
+    implicit val spark = SparkSessionUtil.getSparkSession()
     import spark.implicits._
 
     val list = List("""{"name":"wuxian","age":31, "sex":"01"}""", """{"name":"winson","age":31,"sex":"02"}""")

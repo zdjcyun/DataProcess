@@ -2,7 +2,7 @@ package com.service.data.examples.spark.sql.mongodb
 
 import com.service.data.kafka.clients.producer.SimpleProducer
 import com.service.data.spark.sql.paging.SparkMongoPaging
-import com.service.data.spark.sql.utils.SparkSqlUtil
+import com.service.data.spark.sql.utils.SparkSessionUtil
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.apache.spark.{SparkEnv, TaskContext}
 import org.bson.Document
@@ -14,7 +14,7 @@ import org.bson.Document
   */
 object SparkSqlMongoReadToKafka {
   def main(args: Array[String]): Unit = {
-    implicit val spark = SparkSqlUtil.getSparkSession()
+    implicit val spark = SparkSessionUtil.getSparkSession()
 
     val paging = new SparkMongoPaging(spark)
 
