@@ -1,7 +1,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
-    <groupId>com.service.data</groupId>
+    <groupId>com.gitee.hy-wux.service.data</groupId>
     <artifactId>DataService-Framework</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
@@ -164,29 +164,29 @@
 
             <!-- DataService -->
             <dependency>
-                <groupId>com.service.data</groupId>
+                <groupId>com.gitee.hy-wux.service.data</groupId>
                 <artifactId>commons</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
             <dependency>
-                <groupId>com.service.data</groupId>
+                <groupId>com.gitee.hy-wux.service.data</groupId>
                 <artifactId>kafka-clients</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.service.data</groupId>
+                <groupId>com.gitee.hy-wux.service.data</groupId>
                 <artifactId>kafka-streams</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
             <dependency>
-                <groupId>com.service.data</groupId>
+                <groupId>com.gitee.hy-wux.service.data</groupId>
                 <artifactId>spark-sql</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.service.data</groupId>
+                <groupId>com.gitee.hy-wux.service.data</groupId>
                 <artifactId>spark-streaming</artifactId>
                 <version>${project.version}</version>
             </dependency>
