@@ -1,7 +1,8 @@
 package com.service.data.spark.sql.paging
 
-import com.mongodb.spark.MongoSpark
+import com.mongodb.client.MongoCollection
 import com.mongodb.spark.config.ReadConfig
+import com.mongodb.spark.{MongoConnector, MongoSpark}
 import org.apache.spark.SparkContext
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.bson.Document
@@ -91,6 +92,10 @@ class SparkMongoPaging private() {
     val queryBuffer = new ArrayBuffer[Document]()
     if (minimumObjectId != null) {
       queryBuffer.append(Document.parse("""{ "_id" : { $gt : ObjectId("""" + minimumObjectId + """")}}"""))
+    } else {
+      MongoConnector(readConfig).withCollectionDo(readConfig, { collection: MongoCollection[Document] =>
+        queryBuffer.append(Document.parse("""{ "_id" : { $gte : ObjectId("""" + collection.find().sort(new Document("_id", 1)).limit(1).iterator().next().get("_id").asInstanceOf[ObjectId].toHexString + """")}}"""))
+      })
     }
     if (queryDocument != null && queryDocument.size() > 0) {
       queryBuffer.append(queryDocument)

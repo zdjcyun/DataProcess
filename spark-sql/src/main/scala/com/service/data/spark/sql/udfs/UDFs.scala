@@ -1,6 +1,7 @@
 package com.service.data.spark.sql.udfs
 
 import com.service.data.commons.tools.IdWorker
+import com.service.data.commons.utils.CommUtil
 import org.apache.spark.SparkEnv
 
 import scala.util.Random
@@ -39,7 +40,11 @@ object UDFs {
     * @return
     */
   def roundDecimal(value: java.math.BigDecimal, scale: Int): java.math.BigDecimal = {
-    value.setScale(scale, java.math.BigDecimal.ROUND_HALF_UP)
+    if (CommUtil.isEmpty(value)) {
+      new java.math.BigDecimal(0)
+    } else {
+      value.setScale(scale, java.math.BigDecimal.ROUND_HALF_UP)
+    }
   }
 
   /**
@@ -50,6 +55,10 @@ object UDFs {
     * @return
     */
   def broundDecimal(value: java.math.BigDecimal, scale: Int): java.math.BigDecimal = {
-    value.setScale(scale, java.math.BigDecimal.ROUND_HALF_EVEN)
+    if (CommUtil.isEmpty(value)) {
+      new java.math.BigDecimal(0)
+    } else {
+      value.setScale(scale, java.math.BigDecimal.ROUND_HALF_EVEN)
+    }
   }
 }
