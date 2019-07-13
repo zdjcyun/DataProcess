@@ -6,8 +6,9 @@ import com.mongodb.spark._
 import com.mongodb.spark.config.{ReadConfig, WriteConfig}
 import com.service.data.commons.property.ServiceProperty
 import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.{Column, DataFrame, Row, SparkSession}
-import org.bson.Document
+import org.apache.spark.sql.types.StructType
+import org.apache.spark.sql.{Column, DataFrame, Dataset, Row, SparkSession}
+import org.bson.{BsonDocument, Document}
 
 import scala.collection.JavaConversions._
 import scala.reflect.ClassTag
@@ -45,6 +46,66 @@ object MongoUtil {
   }
 
   /**
+    * 加载MongoDB中的数据
+    *
+    * @param url        MongDB的url
+    * @param database   库名
+    * @param collection 集合名
+    * @param spark
+    * @return
+    */
+  def readFromMongoDB(url: String = ServiceProperty.properties.getOrElse("spark.mongodb.input.uri", ""),
+                      database: String = ServiceProperty.properties.getOrElse("spark.mongodb.input.database", ""),
+                      collection: String = ServiceProperty.properties.getOrElse("spark.mongodb.input.collection", ""))
+                     (implicit spark: SparkSession): DataFrame = {
+    spark.read.format("com.mongodb.spark.sql.DefaultSource")
+      .option("url", url)
+      .option("database", database)
+      .option("collection", collection)
+      .load()
+  }
+
+  def genDocumentByRow(row: Row, cols: Seq[String]): Document = {
+    val doc = new Document()
+    cols.foreach(col => {
+      doc.put(col, row.get(row.fieldIndex(col)))
+    })
+    doc
+  }
+
+  def genDocumentByDocument(row: BsonDocument, cols: Seq[String]): Document = {
+    val doc = new Document()
+    cols.foreach(col => {
+      doc.put(col, row.get(col))
+    })
+    doc
+  }
+
+  /**
+    * 将DataFrame转换为RDD[BsonDocument]
+    *
+    * @param df
+    * @param extendedBsonTypes
+    * @return
+    */
+  def convertToDocument(df: DataFrame, extendedBsonTypes: Boolean): RDD[BsonDocument] = {
+    convertToDocument(df.rdd, df.schema, extendedBsonTypes)
+  }
+
+  /**
+    * 将RDD[Row]转换为RDD[BsonDocument]
+    *
+    * @param rdd
+    * @param schema
+    * @param extendedBsonTypes
+    * @return
+    */
+  def convertToDocument(rdd: RDD[Row], schema: StructType, extendedBsonTypes: Boolean): RDD[BsonDocument] = {
+    val mapper = MongoMapFunctions.rowToDocumentMapper(schema, extendedBsonTypes)
+    rdd.map(row => mapper(row))
+  }
+
+  /**
     * 保存数据到MongoDB
     *
     * @param collection MongoDB的集合名称，目标集合名称
@@ -53,14 +114,6 @@ object MongoUtil {
     */
   def saveToMongoDB(collection: String, df: DataFrame)(implicit spark: SparkSession): Unit = {
     MongoSpark.save(df, WriteConfig(Map("collection" -> collection), Some(WriteConfig(spark))))
-  }
-
-  private def genDocumentBySchema(row: Row, cols: Seq[String]): Document = {
-    val doc = new Document()
-    cols.foreach(col => {
-      doc.put(col, row.get(row.fieldIndex(col)))
-    })
-    doc
   }
 
   /**
@@ -74,8 +127,8 @@ object MongoUtil {
     */
   def upsertToMongoDB(collection: String, df: DataFrame, keys: Seq[String], cols: Seq[String])(implicit spark: SparkSession): Unit = {
     val rdd = df.rdd.map(row => {
-      val keyDoc = genDocumentBySchema(row, keys)
-      val colDoc = genDocumentBySchema(row, cols)
+      val keyDoc = genDocumentByRow(row, keys)
+      val colDoc = genDocumentByRow(row, cols)
       new UpdateManyModel[Document](keyDoc, new Document("$set", colDoc), new UpdateOptions().upsert(true))
     })
     bulkWriteMongoDB(rdd, WriteConfig(Map("collection" -> collection), Some(WriteConfig(spark))))
@@ -93,8 +146,8 @@ object MongoUtil {
     */
   def pushToMongoDB(collection: String, df: DataFrame, keys: Seq[String], pushCols: Seq[String], pushKey: String)(implicit spark: SparkSession): Unit = {
     val rdd = df.rdd.map(row => {
-      val keyDoc = genDocumentBySchema(row, keys)
-      val pushDoc = genDocumentBySchema(row, pushCols)
+      val keyDoc = genDocumentByRow(row, keys)
+      val pushDoc = genDocumentByRow(row, pushCols)
 
       new UpdateManyModel[Document](keyDoc, new Document("$push", pushDoc))
     })

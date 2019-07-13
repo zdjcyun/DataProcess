@@ -2,6 +2,7 @@ package com.service.data.kafka.clients.producer
 
 import java.util.Properties
 
+import com.service.data.commons.property.ServiceProperty
 import org.apache.kafka.clients.producer.{KafkaProducer, ProducerConfig}
 import org.apache.kafka.common.serialization.StringSerializer
 
@@ -18,8 +19,8 @@ object SimpleProducer {
     */
   private val kafkaProducerProperties = {
     val props = new Properties()
-    props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "service.hy-wux.com:9092")
-    props.put(ProducerConfig.CLIENT_ID_CONFIG, "SimpleProducerExample")
+    props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, ServiceProperty.properties.get("kafka.bootstrap.servers").get)
+    props.put(ProducerConfig.CLIENT_ID_CONFIG, ServiceProperty.properties.get("kafka.producer.client.id").get)
     props.put(ProducerConfig.ACKS_CONFIG, "1")
     props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, classOf[StringSerializer])
     props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, classOf[StringSerializer])

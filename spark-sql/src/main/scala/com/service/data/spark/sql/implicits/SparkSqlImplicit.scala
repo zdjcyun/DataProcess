@@ -1,7 +1,7 @@
 package com.service.data.spark.sql.implicits
 
 import com.service.data.commons.logs.Logging
-import org.apache.spark.sql.{Dataset, SparkDatasetUtil}
+import org.apache.spark.sql.{Dataset, SparkDataset}
 
 import scala.util.Try
 
@@ -53,7 +53,7 @@ object SparkSqlImplicit {
       * @param truncate 是否截取超长内容
       */
     def debugShow(numRows: Int, truncate: Boolean): Unit = {
-      debug("数据集的内容为：\n" + SparkDatasetUtil.showString(ds, numRows, truncate))
+      debug("数据集的内容为：\n" + SparkDataset.showString(ds, numRows, truncate))
     }
   }
 

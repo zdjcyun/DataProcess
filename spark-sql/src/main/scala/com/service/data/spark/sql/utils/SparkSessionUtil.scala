@@ -1,5 +1,6 @@
 package com.service.data.spark.sql.utils
 
+import com.service.data.commons.property.ServiceProperty
 import com.service.data.spark.sql.udfs.UDFs
 import org.apache.spark.sql.SparkSession
 
@@ -44,14 +45,24 @@ object SparkSessionUtil {
     * @return
     */
   def getSparkSession(appName: String): SparkSession = {
-    SparkSession.builder()
+    val builder = SparkSession.builder()
       .appName(appName)
       .master("local[*]")
-      .config("spark.mongodb.input.uri", "mongodb://localhost:27017/tbdss.DocTest")
-      .config("spark.mongodb.output.uri", "mongodb://localhost:27017/tbdss.DocTest")
-      .config("spark.redis.host", "localhost")
-      .config("spark.redis.port", "6379")
-      .getOrCreate()
-      .withDefaultUdfs()
+
+    // MongoDB 参数设置
+    ServiceProperty.properties.filter(_._1.startsWith("spark.mongodb")).foreach(x => {
+      builder.config(x._1, x._2)
+    })
+
+    // Redis 参数设置
+    ServiceProperty.properties.filter(_._1.startsWith("spark.redis")).foreach(x => {
+      builder.config(x._1, x._2)
+    })
+
+    val spark = builder.getOrCreate()
+
+    spark.withDefaultUdfs()
+
+    spark
   }
 }

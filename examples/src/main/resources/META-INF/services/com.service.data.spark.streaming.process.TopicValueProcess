@@ -1,2 +1,0 @@
-com.service.data.spark.streaming.process.DefaultTextProcess
-com.service.data.spark.streaming.process.DefaultJsonProcess

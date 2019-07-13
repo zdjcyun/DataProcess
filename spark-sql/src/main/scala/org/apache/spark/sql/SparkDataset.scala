@@ -8,7 +8,7 @@ package org.apache.spark.sql
   *         单独将该类提取到org.apache.spark.sql包下的原因是：
   *         Spark限制了方法的权限范围：private[sql] def showString(_numRows: Int, truncate: Int = 20): String
   */
-object SparkDatasetUtil {
+object SparkDataset {
   /**
     * 获取Dataset中的前numRows行数据
     *
