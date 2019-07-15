@@ -39,16 +39,6 @@ class SparkMongoPaging private() {
   @BeanProperty var readConfig: ReadConfig = _
 
   /**
-    * 数据库
-    */
-  @BeanProperty var database: String = _
-
-  /**
-    * 集合
-    */
-  @BeanProperty var collection: String = _
-
-  /**
     * 分页大小，默认10000
     */
   @BeanProperty var pageSize: Int = 10000
@@ -90,19 +80,16 @@ class SparkMongoPaging private() {
     this.readConfig = ReadConfig(sparkSession)
   }
 
-  def this(sparkSession: SparkSession, database: String) {
+  def this(sparkSession: SparkSession, collection: String) {
     this()
     this.sparkSession = sparkSession
-    this.readConfig = ReadConfig(sparkSession)
-    this.database = database
+    this.readConfig = ReadConfig(Map(ReadConfig.collectionNameProperty -> collection), Some(ReadConfig(sparkSession)))
   }
 
   def this(sparkSession: SparkSession, database: String, collection: String) {
     this()
     this.sparkSession = sparkSession
-    this.readConfig = ReadConfig(sparkSession)
-    this.database = database
-    this.collection = collection
+    this.readConfig = ReadConfig(Map(ReadConfig.databaseNameProperty -> database, ReadConfig.collectionNameProperty -> collection), Some(ReadConfig(sparkSession)))
   }
 
   /**
