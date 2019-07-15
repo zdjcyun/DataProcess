@@ -1,6 +1,6 @@
 package com.service.data.spark.sql.utils
 
-import com.mongodb.client.MongoCollection
+import com.mongodb.client.{MongoCollection, MongoDatabase}
 import com.mongodb.client.model.{UpdateManyModel, UpdateOptions, WriteModel}
 import com.mongodb.spark._
 import com.mongodb.spark.config.{ReadConfig, WriteConfig}
@@ -9,6 +9,7 @@ import com.service.data.commons.property.ServiceProperty
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.types.StructType
 import org.apache.spark.sql.{Column, DataFrame, Row, SparkSession}
+import org.bson.conversions.Bson
 import org.bson.{BsonDocument, Document}
 
 import scala.collection.JavaConversions._
@@ -107,6 +108,31 @@ object MongoUtil {
   }
 
   /**
+    * 创建视图
+    *
+    * @param readConfig
+    * @param viewName
+    * @param pipeline
+    */
+  def createView(readConfig: ReadConfig, viewName: String, pipeline: Seq[_ <: Bson]): Unit = {
+    MongoConnector(readConfig.asOptions).withDatabaseDo(readConfig, { database: MongoDatabase =>
+      database.getCollection(viewName).drop()
+      database.createView(viewName, readConfig.collectionName, pipeline)
+    })
+  }
+
+  /**
+    * 删除集合
+    *
+    * @param collection
+    */
+  def dropCollection(collection: String)(implicit spark: SparkSession): Unit = {
+    MongoConnector(spark.sparkContext).withDatabaseDo(ReadConfig(spark), { database: MongoDatabase =>
+      database.getCollection(collection).drop()
+    })
+  }
+
+  /**
     * 保存数据到MongoDB
     *
     * @param collection MongoDB的集合名称，目标集合名称
@@ -160,10 +186,9 @@ object MongoUtil {
   }
 
   def bulkWriteMongoDB[D: ClassTag](rdd: RDD[_ <: WriteModel[D]], writeConfig: WriteConfig)(implicit spark: SparkSession): Unit = {
-    val mongoConnector = MongoConnector(writeConfig.asOptions)
     rdd.foreachPartition(x => {
       if (x.nonEmpty) {
-        mongoConnector.withCollectionDo(writeConfig, { collection: MongoCollection[D] =>
+        MongoConnector(writeConfig.asOptions).withCollectionDo(writeConfig, { collection: MongoCollection[D] =>
           x.grouped(ServiceProperty.properties.getOrElse("spark.mongodb.bulkwrite.batch.size", "1024").toInt).foreach(batch => {
             collection.bulkWrite(batch.toList)
           })

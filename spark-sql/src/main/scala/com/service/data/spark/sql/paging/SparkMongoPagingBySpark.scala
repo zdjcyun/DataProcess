@@ -2,16 +2,14 @@ package com.service.data.spark.sql.paging
 
 import com.mongodb.client.MongoCollection
 import com.mongodb.spark.config.ReadConfig
-import com.mongodb.spark.sql.MongoMapFunctions
 import com.mongodb.spark.{MongoConnector, MongoSpark}
-import com.service.data.commons.utils.CommUtil
-import org.apache.spark.sql.types.StructType
-import org.apache.spark.sql.{DataFrame, Row, SparkSession}
+import org.apache.spark.SparkContext
+import org.apache.spark.sql.{DataFrame, SparkSession}
+import org.bson.Document
 import org.bson.types.ObjectId
-import org.bson.{BsonDocument, BsonObjectId, Document}
 
 import scala.beans.BeanProperty
-import scala.collection.mutable.{ArrayBuffer, ListBuffer}
+import scala.collection.mutable.ArrayBuffer
 
 /**
   * @author 伍鲜
@@ -21,27 +19,16 @@ import scala.collection.mutable.{ArrayBuffer, ListBuffer}
   *         1、如果数据量过大，需要给排序字段创建索引；
   *         2、自定义排序不利于分页边界的确定。
   */
-class SparkMongoPaging private() {
-  /**
-    * SparkSession
-    */
-  private var sparkSession: SparkSession = _
-
-  /**
-    * 空Document
-    */
-  private val emptyDocument: Document = new Document()
-  private val objectDocument: Document = new Document("_id", 1)
-
-  /**
-    * MongoSpark ReadConfig
-    */
-  @BeanProperty var readConfig: ReadConfig = _
-
+@deprecated("该方法分页，在MongoDB是多Partition的情况下需要特别注意，容易导致多个Task并行读取数据，造成分页下界无法准确确定，漏读数据。")
+class SparkMongoPagingBySpark private() {
   /**
     * 分页大小，默认10000
     */
   @BeanProperty var pageSize: Int = 10000
+  /**
+    * MongoSpark ReadConfig
+    */
+  @BeanProperty var readConfig: ReadConfig = _
 
   /**
     * 查询条件
@@ -74,31 +61,59 @@ class SparkMongoPaging private() {
     */
   @BeanProperty var minimumObjectId: String = _
 
-  def this(sparkSession: SparkSession) {
+  /**
+    * SparkContext
+    */
+  private var sparkContext: SparkContext = _
+
+  /**
+    * 空Document
+    */
+  private val emptyDocument: Document = new Document()
+
+  def this(spark: SparkSession) {
     this()
-    this.sparkSession = sparkSession
-    this.readConfig = ReadConfig(sparkSession)
+    this.sparkContext = spark.sparkContext
+    this.readConfig = ReadConfig(spark)
   }
 
   def this(sparkSession: SparkSession, collection: String) {
     this()
-    this.sparkSession = sparkSession
+    this.sparkContext = sparkSession.sparkContext
     this.readConfig = ReadConfig(Map(ReadConfig.collectionNameProperty -> collection), Some(ReadConfig(sparkSession)))
   }
 
   def this(sparkSession: SparkSession, database: String, collection: String) {
     this()
-    this.sparkSession = sparkSession
+    this.sparkContext = sparkSession.sparkContext
     this.readConfig = ReadConfig(Map(ReadConfig.databaseNameProperty -> database, ReadConfig.collectionNameProperty -> collection), Some(ReadConfig(sparkSession)))
   }
 
+  def this(sparkContext: SparkContext) {
+    this()
+    this.sparkContext = sparkContext
+    this.readConfig = ReadConfig(sparkContext)
+  }
+
+  def this(sparkContext: SparkContext, collection: String) {
+    this()
+    this.sparkContext = sparkContext
+    this.readConfig = ReadConfig(Map(ReadConfig.collectionNameProperty -> collection), Some(ReadConfig(sparkContext)))
+  }
+
+  def this(sparkContext: SparkContext, database: String, collection: String) {
+    this()
+    this.sparkContext = sparkContext
+    this.readConfig = ReadConfig(Map(ReadConfig.databaseNameProperty -> database, ReadConfig.collectionNameProperty -> collection), Some(ReadConfig(sparkContext)))
+  }
+
   /**
-    * 构建查询条件的 ArrayBuffer
+    * 构建查询条件
     *
     * @param minimumObjectId
     * @return
     */
-  private def buildQueryDocumentBuffer(minimumObjectId: String): ArrayBuffer[Document] = {
+  private def buildQueryDocument(minimumObjectId: String): Document = {
     val queryBuffer = new ArrayBuffer[Document]()
     if (minimumObjectId != null) {
       queryBuffer.append(Document.parse("""{ "_id" : { $gt : ObjectId("""" + minimumObjectId + """")}}"""))
@@ -110,62 +125,12 @@ class SparkMongoPaging private() {
     if (queryDocument != null && queryDocument.size() > 0) {
       queryBuffer.append(queryDocument)
     }
-    queryBuffer
-  }
 
-  /**
-    * 构建查询条件
-    *
-    * @return
-    */
-  private def buildQueryDocument(): Document = {
-    // 根据查询条件
-    val queryBuffer = buildQueryDocumentBuffer(minimumObjectId)
     if (queryBuffer.size > 0) {
-      Document.parse("""{ $and : [""" + queryBuffer.map(_.toJson()).mkString(",") + """] }""")
+      Document.parse("""{ $match : { $and : [""" + queryBuffer.map(_.toJson()).mkString(",") + """] } }""")
     } else {
       emptyDocument
     }
-  }
-
-  /**
-    * 构建筛选条件
-    *
-    * @return
-    */
-  private def buildProjectionDocument(): Document = {
-    if (CommUtil.isNotEmpty(projectFields)) {
-      val projection = new Document("_id", 1)
-      projectFields.foreach(projection.put(_, 1))
-      projection
-    } else {
-      emptyDocument
-    }
-  }
-
-  /**
-    * 获取下一页数据
-    *
-    * @return
-    */
-  private def buildSchema(): StructType = {
-    val pipelineBuffer = new ArrayBuffer[Document]()
-    // 根据查询条件
-    val queryBuffer = buildQueryDocumentBuffer(minimumObjectId)
-    if (queryBuffer.size > 0) {
-      pipelineBuffer.append(Document.parse("""{ $match : { $and : [""" + queryBuffer.map(_.toJson()).mkString(",") + """] } }"""))
-    }
-    // 仅查询指定字段
-    if (projectFields != null && projectFields.size > 0) {
-      pipelineBuffer.append(new Document("$project", buildProjectionDocument()))
-    }
-    // ID字段升序排序
-    pipelineBuffer.append(Document.parse("""{ $sort : { "_id" : 1 } }"""))
-    // 仅返回指定条数
-    pipelineBuffer.append(Document.parse("{ $limit : " + pageSize + " }"))
-
-    // 根据条件加载数据
-    MongoSpark.load(sparkSession.sparkContext, readConfig).withPipeline(pipelineBuffer).toDF().schema
   }
 
   /**
@@ -174,12 +139,20 @@ class SparkMongoPaging private() {
     * @return
     */
   def hasNextPage(): Boolean = {
-    MongoConnector(sparkSession.sparkContext).withCollectionDo(readConfig, { collection: MongoCollection[BsonDocument] =>
-      val cursor = collection.find(buildQueryDocument()).projection(objectDocument).sort(objectDocument).limit(1).batchSize(1).iterator()
-      val flag = cursor.hasNext()
-      cursor.close()
-      flag
-    })
+    val pipelineBuffer = new ArrayBuffer[Document]()
+    // 根据查询条件
+    val queryBson = buildQueryDocument(minimumObjectId)
+    if (queryBson.size() > 0) {
+      pipelineBuffer.append(queryBson)
+    }
+    // 仅查询ID字段
+    pipelineBuffer.append(Document.parse("""{ $project : { "_id" : 1 } }"""))
+    // ID字段升序排序
+    pipelineBuffer.append(Document.parse("""{ $sort : { "_id" : 1 } }"""))
+    // 仅返回一条数据
+    pipelineBuffer.append(Document.parse("""{ $limit : 1 }"""))
+    // 仅判断有无
+    MongoSpark.load(sparkContext, readConfig).withPipeline(pipelineBuffer).count() > 0
   }
 
   /**
@@ -188,20 +161,28 @@ class SparkMongoPaging private() {
     * @return
     */
   def nextPage(): DataFrame = {
-    val list = new ListBuffer[Row]()
-    val schema = buildSchema()
-    MongoConnector(sparkSession.sparkContext).withCollectionDo(readConfig, { collection: MongoCollection[BsonDocument] =>
-      val cursor = collection.find(buildQueryDocument()).projection(buildProjectionDocument()).sort(objectDocument).limit(pageSize).batchSize(pageSize).iterator()
-      while (cursor.hasNext()) {
-        val document = cursor.next()
-        if (!cursor.hasNext()) {
-          minimumObjectId = document.get("_id").asInstanceOf[BsonObjectId].getValue.toHexString
-        }
-        list.append(MongoMapFunctions.documentToRow(document, schema, Array.empty[String]))
-      }
-      cursor.close()
-    })
-    val rdd = sparkSession.sparkContext.parallelize(list)
-    sparkSession.createDataFrame(rdd, schema)
+    val pipelineBuffer = new ArrayBuffer[Document]()
+    // 根据查询条件
+    val queryBson = buildQueryDocument(minimumObjectId)
+    if (queryBson.size() > 0) {
+      pipelineBuffer.append(queryBson)
+    }
+    // 仅查询指定字段
+    if (projectFields != null && projectFields.size > 0) {
+      pipelineBuffer.append(Document.parse("{ $project : { " + projectFields.map(x => s"${x} : 1").mkString(",") + " }}"))
+    }
+    // ID字段升序排序
+    pipelineBuffer.append(Document.parse("""{ $sort : { "_id" : 1 } }"""))
+    // 仅返回指定条数
+    pipelineBuffer.append(Document.parse("{ $limit : " + pageSize + " }"))
+
+    // 根据条件加载数据
+    val rdd = MongoSpark.load(sparkContext, readConfig).withPipeline(pipelineBuffer)
+
+    // 记录一下当前分页的ID上界，也就是下一个分页的下界
+    minimumObjectId = rdd.map(_.get("_id").asInstanceOf[ObjectId].toHexString).max()
+
+    // 返回当前分页的数据
+    rdd.toDF()
   }
 }
