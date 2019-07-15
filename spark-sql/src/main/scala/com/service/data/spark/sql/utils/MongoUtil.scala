@@ -4,10 +4,11 @@ import com.mongodb.client.MongoCollection
 import com.mongodb.client.model.{UpdateManyModel, UpdateOptions, WriteModel}
 import com.mongodb.spark._
 import com.mongodb.spark.config.{ReadConfig, WriteConfig}
+import com.mongodb.spark.sql.MongoMapFunctions
 import com.service.data.commons.property.ServiceProperty
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.types.StructType
-import org.apache.spark.sql.{Column, DataFrame, Dataset, Row, SparkSession}
+import org.apache.spark.sql.{Column, DataFrame, Row, SparkSession}
 import org.bson.{BsonDocument, Document}
 
 import scala.collection.JavaConversions._
