@@ -17,7 +17,7 @@ object SimpleProducer {
   /**
     * Kafka生产者相关参数
     */
-  private val kafkaProducerProperties = {
+  val kafkaProducerProperties = {
     val props = new Properties()
     props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, ServiceProperty.properties.get("kafka.bootstrap.servers").get)
     props.put(ProducerConfig.CLIENT_ID_CONFIG, ServiceProperty.properties.get("kafka.producer.client.id").get)
