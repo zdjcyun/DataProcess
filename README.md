@@ -1,8 +1,15 @@
 # DataService-Framework
 
 #### 项目介绍
-基于大数据平台的数据处理服务框架。
-使用Flume组件采集系统日志，并将采集到的日志存放到Kafka消息队列，供SparkStreaming程序消费使用。软件的目的是实现日志文件的实时采集，并实时加工处理到数据库，供其他服务程序使用。
+基于大数据平台的数据处理服务框架。  
+结合大数据项目实际使用场景，提取出的一些通用的功能，形成大数据平台数据处理框架。  
+目前主要实现的功能有：  
+1、参数信息配置模块，可实现采用数据库进行配置和Properties文件进行配置  
+2、集成Kafka，实现了Kafka的生产者和消费者相关的功能  
+3、集成MongoDB，实现了MongoDB的数据读取、写入等，实现了SparkSQL通过DataFrame与MongoDB的数据进行交互，并且实现了分页读取、流式读取等特殊读取方式  
+4、集成Redis，实现了Redis的读取、写入等，实现了SparkSQL通过DataFrame与Redis的数据进行交互  
+5、SparkStreaming流式处理Kafka、MongoDB的数据  
+6、手动记录Kafka的偏移量，实现了基于数据库进行记录和基于Zookeeper进行记录  
 
 #### 软件架构
 软件结构如下：  
@@ -13,7 +20,7 @@ DataService-Framework      项目根目录
 ├── kafka-clients       KafkaClients相关功能，比如生产者、消费者等。
 ├── kafka-streams       主题数据过滤模块，Kafka自带的流处理功能，业务系统记录的日志如果包含了大量的：程序异常日志、数据库操作日志、调试日志等日志信息，而采集的数据只需要日志文件中的特定数据的日志记录，那么对于我们采集到的日志来说，可能会有90%以上的日志都是垃圾数据，但是Flume组件没有提供日志过滤功能，而Spark程序又不应该消费这些数据。这时就需要提供一个中间层，将Flume采集到的Topic1的日志中满足条件的数据筛选出来放到Topic2中，Spark程序只需要消费Topic2的数据即可，过滤条件按照正则表达式进行配置。这样Spark消费Topic2的数据都是我们需要的数据，并且我们可以及时的清理掉Topic1的数据以释放空间。
 ├── spark-sql           SparkSQL相关功能，扩展了Dataset/DataFrame的方法，集成Redis数据的读写、MongoDB数据的读写。  
-└── spark-streaming     SparkStreaming实时数据处理模块，通过SparkStreaming程序，准实时消费Kafka中的数据，经过字段数据解析、码值标准化处理等操作后，落地到DB中，供其他程序、服务使用。
+└── spark-streaming     SparkStreaming实时数据处理模块，通过SparkStreaming程序，准实时消费Kafka中的数据，流式方式处理MongoDB中的数据。
 ```
 
 #### 功能扩展
