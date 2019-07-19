@@ -4,6 +4,7 @@ import com.mongodb.client.{MongoCollection, MongoDatabase}
 import com.mongodb.client.model.{UpdateManyModel, UpdateOptions, WriteModel}
 import com.mongodb.spark._
 import com.mongodb.spark.config.{ReadConfig, WriteConfig}
+import com.mongodb.spark.rdd.MongoRDD
 import com.mongodb.spark.sql.MongoMapFunctions
 import com.service.data.commons.property.ServiceProperty
 import org.apache.spark.rdd.RDD
@@ -22,24 +23,24 @@ import scala.reflect.ClassTag
   */
 object MongoUtil {
   /**
-    * 加载MongoDB中的数据
+    * 加载MongoDB中的数据，会直接加载所有数据
     *
     * @param collection MongoDB的集合名称，目标集合名称
     * @param spark      SparkSession
-    * @return
+    * @return 加载所有数据后形成的DataFrame
     */
   def loadFromMongoDB(collection: String)(implicit spark: SparkSession): DataFrame = {
     spark.sparkContext.loadFromMongoDB(ReadConfig(Map("collection" -> collection), Some(ReadConfig(spark)))).toDF()
   }
 
   /**
-    * 根据DataFrame中主键数据加载MongoDB中的相同主键的数据
+    * 根据DataFrame中主键数据加载MongoDB中的相同主键的数据，会直接加载所有数据
     *
     * @param collection MongoDB的集合名称，目标集合名称
     * @param df         DataFrame，根据给定的DataFrame中的主键数据过滤MongoDB中的数据
     * @param keys       主键字段，与MongoDB中记录进行关联的数据主键字段
     * @param spark      SparkSession
-    * @return
+    * @return 加载所有数据后形成的DataFrame
     */
   def loadFromMongoDB(collection: String, df: DataFrame, keys: Seq[String])(implicit spark: SparkSession): DataFrame = {
     spark.sparkContext.loadFromMongoDB(ReadConfig(Map("collection" -> collection), Some(ReadConfig(spark))))
@@ -48,13 +49,13 @@ object MongoUtil {
   }
 
   /**
-    * 加载MongoDB中的数据
+    * 加载MongoDB中的数据，会直接加载所有数据
     *
     * @param url        MongDB的url
     * @param database   库名
     * @param collection 集合名
     * @param spark
-    * @return
+    * @return 加载所有数据后形成的DataFrame
     */
   def readFromMongoDB(url: String = ServiceProperty.properties.getOrElse("spark.mongodb.input.uri", ""),
                       database: String = ServiceProperty.properties.getOrElse("spark.mongodb.input.database", ""),
@@ -65,6 +66,23 @@ object MongoUtil {
       .option("database", database)
       .option("collection", collection)
       .load()
+  }
+
+  /**
+    * 加载MongoRDD，会直接加载所有数据
+    *
+    * @param readConfig
+    * @param sparkSession
+    * @return 加载所有数据后形成的RDD
+    */
+  def toBsonDocumentRDD[T <: Bson :ClassTag](readConfig: ReadConfig, pipeline: Seq[Bson] = Seq())(implicit sparkSession: SparkSession): MongoRDD[T] = {
+    MongoSpark.builder()
+      .sparkSession(sparkSession)
+      .connector(MongoConnector(readConfig))
+      .readConfig(readConfig)
+      .pipeline(pipeline)
+      .build()
+      .toRDD[T]()
   }
 
   def genDocumentByRow(row: Row, cols: Seq[String]): Document = {

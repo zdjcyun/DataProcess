@@ -1,6 +1,7 @@
 package com.service.data.examples.spark.sql.mongodb
 
 import com.service.data.kafka.clients.producer.{KafkaSink, SimpleProducer}
+import com.service.data.kafka.clients.properties.KafkaProperties
 import com.service.data.spark.sql.paging.SparkMongoPagingByView
 import com.service.data.spark.sql.utils.SparkSessionUtil
 import org.apache.kafka.clients.producer.ProducerRecord
@@ -39,7 +40,7 @@ object SparkSqlMongoReadToKafka {
 
     // 初始化广播 Kafka Producer
     val kafkaProducer = {
-      spark.sparkContext.broadcast(KafkaSink[String, String](SimpleProducer.kafkaProducerProperties))
+      spark.sparkContext.broadcast(KafkaSink[String, String](KafkaProperties.kafkaProducerProperties))
     }
 
     while ( {
