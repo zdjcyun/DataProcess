@@ -1,8 +1,9 @@
 package com.service.data.spark.sql.utils
 
 import com.service.data.commons.property.ServiceProperty
-import com.service.data.spark.sql.udfs.UDFs
 import org.apache.spark.sql.SparkSession
+
+import com.service.data.spark.sql.implicits.SparkSessionImplicit._
 
 /**
   * @author 伍鲜
@@ -10,27 +11,6 @@ import org.apache.spark.sql.SparkSession
   *         SparkSession工具
   */
 object SparkSessionUtil {
-
-  /**
-    * SparkSession功能扩展
-    *
-    * @param spark
-    */
-  implicit class SparkSessionImplicit(spark: SparkSession) {
-    /**
-      * 注册自定义函数
-      */
-    def withDefaultUdfs(): SparkSession = {
-      // 分布式ID生成
-      spark.sqlContext.udf.register("GenerateID", UDFs.GenerateID)
-      // round
-      spark.sqlContext.udf.register("roundDecimal", UDFs.roundDecimal(_: java.math.BigDecimal, _: Int))
-      // bround
-      spark.sqlContext.udf.register("broundDecimal", UDFs.broundDecimal(_: java.math.BigDecimal, _: Int))
-
-      spark
-    }
-  }
 
   /**
     * 获取SparkSession

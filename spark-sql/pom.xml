@@ -26,7 +26,7 @@
         </dependency>
         <dependency>
             <groupId>com.redislabs</groupId>
-            <artifactId>spark-redis</artifactId>
+            <artifactId>spark-redis_2.11</artifactId>
         </dependency>
         <dependency>
             <groupId>org.mongodb.spark</groupId>

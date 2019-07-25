@@ -14,7 +14,7 @@ import org.bson.BsonDocument
   */
 object SparkSqlMongoRead {
   def main(args: Array[String]): Unit = {
-    toBsonDocumentRDD()
+    loadFromMongoDB()
   }
 
   def readFromMongoDB(): Unit = {
@@ -23,6 +23,10 @@ object SparkSqlMongoRead {
     val watch = new Stopwatch
 
     val rdd = MongoUtil.readFromMongoDB()
+    val df = rdd.toDF()
+
+    df.printSchema()
+    df.debugShow()
 
     println(s"完成：${watch}")
   }
@@ -34,6 +38,9 @@ object SparkSqlMongoRead {
 
     val rdd = MongoUtil.toBsonDocumentRDD[BsonDocument](ReadConfig(Map(ReadConfig.collectionNameProperty -> "DocTest1", ReadConfig.sampleSizeProperty -> "100"), Some(ReadConfig(spark))))
     val df = rdd.toDF()
+
+    df.printSchema()
+    df.debugShow()
 
     println(s"完成：${watch}")
   }
@@ -54,6 +61,7 @@ object SparkSqlMongoRead {
 
     // 读取MongoDB
     val df = MongoUtil.loadFromMongoDB("DocTest")
+
     df.printSchema()
     df.debugShow()
   }

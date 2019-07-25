@@ -28,7 +28,7 @@ object UDFs {
     *
     * @return
     */
-  def GenerateID = () => {
+  def GenerateID: String = {
     s"${idWorker.nextId()}"
   }
 

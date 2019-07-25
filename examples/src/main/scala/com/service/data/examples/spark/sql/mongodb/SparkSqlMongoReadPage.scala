@@ -17,8 +17,8 @@ import scala.util.Try
 object SparkSqlMongoReadPage extends Logging {
   def main(args: Array[String]): Unit = {
     mongoPageReadByView()
-    mongoPageReadByJava()
-    mongoPageReadBySpark()
+//    mongoPageReadByJava()
+//    mongoPageReadBySpark()
   }
 
   def mongoPageReadByView(): Unit = {

@@ -1,5 +1,6 @@
 package com.service.data.examples.spark.sql
 
+import com.service.data.commons.monitor.Stopwatch
 import com.service.data.spark.sql.utils.SparkSessionUtil
 
 /**
@@ -11,6 +12,13 @@ object SparkSqlReadList {
   def main(args: Array[String]): Unit = {
     implicit val spark = SparkSessionUtil.getSparkSession()
     import spark.implicits._
+
+    val watch = new Stopwatch()
+
+    sys.addShutdownHook {
+      println(s"执行完成，总共耗时：${watch}")
+      println(spark.sparkContext.getConf.getAll)
+    }
 
     val list = List("""{"name":"wuxian","age":31, "sex":"01"}""", """{"name":"winson","age":31,"sex":"02"}""")
     val df = spark.read.json(spark.createDataset(list))
