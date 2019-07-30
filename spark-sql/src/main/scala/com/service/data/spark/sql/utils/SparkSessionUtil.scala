@@ -2,8 +2,8 @@ package com.service.data.spark.sql.utils
 
 import com.service.data.commons.property.ServiceProperty
 import org.apache.spark.sql.SparkSession
-
 import com.service.data.spark.sql.implicits.SparkSessionImplicit._
+import org.apache.spark.{SparkConf, SparkContext}
 
 /**
   * @author 伍鲜
@@ -25,6 +25,10 @@ object SparkSessionUtil {
     * @return
     */
   def getSparkSession(appName: String): SparkSession = {
+
+    // 保障在SparkSession初始化前SparkEnv可用
+    SparkContext.getOrCreate(new SparkConf().setAppName(appName))
+
     val builder = SparkSession.builder()
       .appName(appName)
       .master("local[*]")
