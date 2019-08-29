@@ -4,34 +4,28 @@
         <groupId>com.gitee.hy-wux.service.data</groupId>
         <artifactId>DataService-Framework</artifactId>
         <version>1.0-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
     </parent>
-    <artifactId>examples</artifactId>
-    <name>DataService Examples</name>
+    <artifactId>rule-engine</artifactId>
+    <name>DataService Rule Engine</name>
 
     <modelVersion>4.0.0</modelVersion>
 
     <inceptionYear>2018</inceptionYear>
 
+    <properties>
+    </properties>
+
     <dependencies>
         <!-- DataService -->
-
         <dependency>
             <groupId>com.gitee.hy-wux.service.data</groupId>
-            <artifactId>kafka-clients</artifactId>
+            <artifactId>commons</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>com.gitee.hy-wux.service.data</groupId>
-            <artifactId>rule-engine</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.gitee.hy-wux.service.data</groupId>
-            <artifactId>spark-sql</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.gitee.hy-wux.service.data</groupId>
-            <artifactId>spark-streaming</artifactId>
+            <groupId>com.googlecode.hammurabi</groupId>
+            <artifactId>hammurabi_2.11</artifactId>
         </dependency>
     </dependencies>
 </project>

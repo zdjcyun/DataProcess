@@ -12,14 +12,17 @@
     <inceptionYear>2018</inceptionYear>
 
     <modules>
-        <module>redislabs/spark-redis_2.11</module>
-        <module>mongodb/mongo-spark-connector_2.11</module>
+        <module>third-party/hammurabi/hammurabi_2.11</module>
+        <module>third-party/mongodb/mongo-spark-connector_2.11</module>
+        <module>third-party/redislabs/spark-redis_2.11</module>
 
         <module>commons</module>
         <module>examples</module>
 
         <module>kafka-clients</module>
         <module>kafka-streams</module>
+
+        <module>rule-engine</module>
 
         <module>spark-sql</module>
         <module>spark-streaming</module>
@@ -31,7 +34,6 @@
         <encoding>UTF-8</encoding>
         <scala.version>2.11.8</scala.version>
         <scalikjdbc.version>2.5.0</scalikjdbc.version>
-        <log4j.version>1.2.17</log4j.version>
 
         <spark.version>2.2.0</spark.version>
 
@@ -41,6 +43,7 @@
 
         <spark-redis.version>2.4.0-WUX-2.2.0</spark-redis.version>
         <mongo-spark.version>2.4.1-WUX-2.2.0</mongo-spark.version>
+        <rule-engine.version>0.1-WUX-2.2.0</rule-engine.version>
     </properties>
 
     <repositories>
@@ -61,11 +64,10 @@
 
     <dependencyManagement>
         <dependencies>
-            <!-- Log4j -->
             <dependency>
-                <groupId>log4j</groupId>
-                <artifactId>log4j</artifactId>
-                <version>${log4j.version}</version>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>1.7.25</version>
             </dependency>
 
             <!-- Scala -->
@@ -161,6 +163,13 @@
                 <version>${mongo-spark.version}</version>
             </dependency>
 
+            <!-- RuleEngine -->
+            <dependency>
+                <groupId>com.googlecode.hammurabi</groupId>
+                <artifactId>hammurabi_2.11</artifactId>
+                <version>${rule-engine.version}</version>
+            </dependency>
+
             <!-- DataService -->
             <dependency>
                 <groupId>com.gitee.hy-wux.service.data</groupId>
@@ -176,6 +185,12 @@
             <dependency>
                 <groupId>com.gitee.hy-wux.service.data</groupId>
                 <artifactId>kafka-streams</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.gitee.hy-wux.service.data</groupId>
+                <artifactId>rule-engine</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
