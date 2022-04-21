@@ -4,7 +4,9 @@ import com.service.data.commons.property.ServiceProperty
 import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.kafka.clients.producer.ProducerConfig
 import org.apache.kafka.common.serialization.StringSerializer
-
+  /**
+    * KafkaProperties
+    */
 object KafkaProperties {
   /**
     * Kafka生产者相关参数
