@@ -6,6 +6,7 @@ package com.service.data.commons.tools
   *         Twitter的分布式自增ID算法Snowflake
   */
 class IdWorker {
+ 
   private var workerId = 0L
   private var datacenterId = 0L
   private var sequence = 0L
