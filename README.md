@@ -80,7 +80,7 @@ DataProcess      项目根目录
 
 ###  :cat:程序运行
 
-#### **:one: **数据源设置
+#### :one: 数据源设置
 
 在运行程序之前，需要设置配置信息所在的数据库的数据源，以及SparkStreaming程序处理后的数据的最终落地的数据库数据源信息。主要修改的是commons下的db.properties文件，修改里面的数据库驱动、连接、用户、密码等信息。
 
@@ -98,7 +98,7 @@ DataProcess      项目根目录
 
 
 
-#### **:two: **本地运行
+#### :two: 本地运行
 
 SparkStreaming程序要在本地运行，需要指定master，可以设置为local[2]。
 
@@ -110,7 +110,7 @@ SparkStreaming程序要在本地运行，需要指定master，可以设置为loc
 
 然后直接运行StreamingFromKafka类即可。
 
-#### **:three:** 打包部署
+#### :three: 打包部署
 
 最终的SparkStreaming程序将运行在Yarn上，因此需要将master设置去掉。
 
