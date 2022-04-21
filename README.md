@@ -159,8 +159,9 @@ SparkStreaming程序要在本地运行，需要指定master，可以设置为loc
 
 如果你希望参与贡献 欢迎 `Pull Request`，或给我们 `报告 Bug`。
 
+这个包就是打包后的最终结果，可以直接提交到Yarn上运行。
+
 > 强烈推荐阅读 [《提问的智慧》](https://gitee.com/link?target=https%3A%2F%2Fgithub.com%2Fryanhanwu%2FHow-To-Ask-Questions-The-Smart-Way)(**本指南不提供此项目的实际支持服务！**)、[《如何有效地报告 Bug》](https://gitee.com/link?target=http%3A%2F%2Fwww.chiark.greenend.org.uk%2F%7Esgtatham%2Fbugs-cn.html)、[《如何向开源项目提交无法解答的问题》](https://gitee.com/link?target=https%3A%2F%2Fzhuanlan.zhihu.com%2Fp%2F25795393)，更好的问题更容易获得帮助。
 
 感谢所有向 DataProcess贡献的朋友!
-
 
